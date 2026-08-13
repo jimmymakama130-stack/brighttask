@@ -541,5 +541,15 @@
 
   </main>
 
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const referral = params.get("ref");
+
+  if (referral) {
+    document.getElementById("referral_code").value = referral.toUpperCase();
+  }
+</script>
+
 </body>
 </html>

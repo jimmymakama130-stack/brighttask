@@ -1294,6 +1294,32 @@ def my_submissions_page():
     page = page.replace("{{SUBMISSION_CARDS}}", "\n".join(cards))
     return page
 
+@app.route("/referrals.html")
+def referrals_page():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    stored_user = next(
+        (u for u in load_users() if u.get("id") == user.get("id")),
+        user
+    )
+
+    page = (VIEWS_DIR / "referrals.html").read_text()
+
+    referral_code = str(
+        stored_user.get("referral_code", "")
+    ).strip().upper()
+
+    page = page.replace(
+        "https://taskbright.com/register?ref=YOURCODE",
+        f"/register.html?ref={referral_code}"
+    )
+
+    return page
+
+
 @app.route("/<page>")
 def page(page):
     if not page.endswith(".html"):
