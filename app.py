@@ -65,6 +65,10 @@ def home():
     return send_from_directory(VIEWS_DIR, "index.html")
 
 
+@app.route("/register.html")
+def register_page():
+    return send_from_directory(VIEWS_DIR, "register.html")
+
 @app.route("/register", methods=["POST"])
 def register():
     first_name = request.form.get("first_name", "").strip()
@@ -91,6 +95,24 @@ def register():
         default=0
     ) + 1
 
+    # Generate a unique referral code for this user.
+    import secrets
+    import string
+
+    existing_codes = {
+        str(user.get("referral_code", "")).strip().upper()
+        for user in users
+        if user.get("referral_code")
+    }
+
+    while True:
+        generated_referral_code = "TB" + "".join(
+            secrets.choice(string.ascii_uppercase + string.digits)
+            for _ in range(6)
+        )
+        if generated_referral_code not in existing_codes:
+            break
+
     user = {
         "id": user_id,
         "first_name": first_name,
@@ -98,7 +120,8 @@ def register():
         "email": email,
         "phone": phone,
         "password": generate_password_hash(password),
-        "referral_code": referral_code,
+        "referral_code": generated_referral_code,
+        "referred_by": referral_code,
         "deposit_balance": 0,
         "task_wallet": 0,
         "referral_wallet": 0,
@@ -616,6 +639,41 @@ def activate():
         float(stored_user.get("task_wallet", 0)) + 100,
         2
     )
+
+    # Pay referral rewards once when this user activates.
+    if not stored_user.get("referral_reward_paid", False):
+        used_code = str(
+            stored_user.get("referred_by", "")
+        ).strip().upper()
+
+        if used_code:
+            referrer = next(
+                (
+                    u for u in users
+                    if str(
+                        u.get("referral_code", "")
+                    ).strip().upper() == used_code
+                    and u.get("id") != stored_user.get("id")
+                ),
+                None
+            )
+
+            if referrer:
+                referrer["referral_wallet"] = round(
+                    float(
+                        referrer.get("referral_wallet", 0)
+                    ) + 100,
+                    2
+                )
+
+                stored_user["referral_wallet"] = round(
+                    float(
+                        stored_user.get("referral_wallet", 0)
+                    ) + 100,
+                    2
+                )
+
+                stored_user["referral_reward_paid"] = True
 
     save_users(users)
 
