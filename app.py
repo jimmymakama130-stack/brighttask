@@ -1304,28 +1304,97 @@ def my_submissions_page():
 @app.route("/referrals.html")
 def referrals_page():
     user = current_user()
-
     if not user:
         return redirect("/login.html")
 
-    stored_user = next(
-        (u for u in load_users() if u.get("id") == user.get("id")),
+    users = load_users()
+
+    # Give every existing user a permanent referral code.
+    changed = False
+    existing_codes = {
+        str(u.get("referral_code", "")).strip().upper()
+        for u in users
+        if u.get("referral_code")
+    }
+
+    for u in users:
+        if not u.get("referral_code"):
+            while True:
+                code = "TB" + "".join(
+                    secrets.choice(string.ascii_uppercase + string.digits)
+                    for _ in range(6)
+                )
+                if code not in existing_codes:
+                    break
+
+            u["referral_code"] = code
+            existing_codes.add(code)
+            changed = True
+
+    if changed:
+        save_users(users)
+
+    # Reload the current user so the generated code is available.
+    user_id = str(user.get("id"))
+    user = next(
+        (u for u in users if str(u.get("id")) == user_id),
         user
     )
 
+    code = str(user.get("referral_code", "")).strip().upper()
+
+    referrals = [
+        u for u in users
+        if str(u.get("referred_by", "")).strip().upper() == code
+        and str(u.get("id")) != user_id
+    ]
+
+    activated = [
+        u for u in referrals
+        if u.get("activated", False)
+    ]
+
+    earnings = len(activated) * 100
+
     page = (VIEWS_DIR / "referrals.html").read_text()
 
-    referral_code = str(
-        stored_user.get("referral_code", "")
-    ).strip().upper()
+    referral_link = (
+        request.host_url.rstrip("/")
+        + "/register.html?ref="
+        + code
+    )
 
+    # Replace the entire referral-link input value.
+    import re
+    page = re.sub(
+        r'<input\s+type="text"\s+value="[^"]*"\s+readonly\s*>',
+        f'<input type="text" value="{escape(referral_link)}" readonly>',
+        page,
+        count=1
+    )
+
+    # Also expose the actual code if the template has a placeholder.
+    page = page.replace("{{REFERRAL_CODE}}", escape(code))
+    page = page.replace("{{REFERRAL_LINK}}", escape(referral_link))
+
+    # Statistics.
     page = page.replace(
-        "https://taskbright.com/register?ref=YOURCODE",
-        f"/register.html?ref={referral_code}"
+        "<strong>0</strong>",
+        f"<strong>{len(referrals)}</strong>",
+        1
+    )
+    page = page.replace(
+        "<strong>0</strong>",
+        f"<strong>{len(activated)}</strong>",
+        1
+    )
+    page = page.replace(
+        "<strong>₦0</strong>",
+        f"<strong>₦{earnings}</strong>",
+        1
     )
 
     return page
-
 
 @app.route("/<page>")
 def page(page):
