@@ -67,7 +67,14 @@ def home():
 
 @app.route("/register.html")
 def register_page():
-    return send_from_directory(VIEWS_DIR, "register.html")
+    page = (VIEWS_DIR / "register.html").read_text()
+    referral = request.args.get("ref", "").strip().upper()
+    page = page.replace(
+        'id="referral_code"',
+        f'id="referral_code" value="{escape(referral)}"',
+        1
+    )
+    return page
 
 @app.route("/register", methods=["POST"])
 def register():
