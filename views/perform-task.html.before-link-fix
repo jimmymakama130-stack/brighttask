@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perform Task — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/tasks.html" class="logo">
+    Task<span>bright</span>
+  </a>
+</header>
+
+<main class="dashboard">
+
+  <a href="/tasks.html" class="back-link">
+    ← Back to Available Tasks
+  </a>
+
+  <section class="form-card">
+  <div style="margin-bottom:28px;">
+
+    <span style="
+      display:inline-block;
+      padding:8px 16px;
+      border-radius:20px;
+      background:#eeeafe;
+      color:#5146d8;
+      font-weight:700;
+      margin-bottom:18px;
+    ">Task</span>
+
+    <h1 style="
+      margin:0 0 24px;
+      font-size:28px;
+      line-height:1.25;
+      word-break:break-word;
+    ">{{TASK_TITLE}}</h1>
+
+    <div style="
+      margin-bottom:24px;
+      padding-bottom:24px;
+      border-bottom:1px solid #e5e7eb;
+    ">
+      <div style="
+        color:#6b7280;
+        font-size:17px;
+        margin-bottom:8px;
+      ">Reward per worker</div>
+
+      <div style="
+        font-size:22px;
+        font-weight:800;
+        line-height:1.2;
+      ">₦{{TASK_REWARD}}</div>
+    </div>
+
+    <div style="
+      display:grid;
+      gap:14px;
+      margin-bottom:26px;
+    ">
+
+      <div style="
+        padding:18px;
+        border-radius:16px;
+        background:#f5f7fa;
+      ">
+        <div style="color:#6b7280;margin-bottom:7px;">
+          Workers needed
+        </div>
+        <strong style="font-size:20px;">
+          {{TASK_WORKERS}}
+        </strong>
+      </div>
+
+      <div style="
+        padding:18px;
+        border-radius:16px;
+        background:#f5f7fa;
+      ">
+        <div style="color:#6b7280;margin-bottom:7px;">
+          Proof required
+        </div>
+        <strong style="font-size:20px;">
+          Screenshot
+        </strong>
+      </div>
+
+    </div>
+
+    <div style="
+      padding:20px;
+      border-radius:16px;
+      background:#f5f7fa;
+      margin-bottom:26px;
+    ">
+      <h2 style="margin:0 0 14px;font-size:24px;">
+        Task to Perform
+      </h2>
+
+      <p style="
+        margin:0 0 18px;
+        line-height:1.7;
+        white-space:pre-line;
+      ">{{TASK_DESCRIPTION}}</p>
+
+      <a href="{{TASK_LINK}}"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="primary-btn full-btn"
+         style="display:block;text-align:center;text-decoration:none;">
+        🔗 Open Task Link
+      </a>
+    </div>
+
+    <h2 style="margin:0 0 16px;font-size:24px;">
+      How to complete this task
+    </h2>
+
+    <ol style="
+      margin:0;
+      padding-left:24px;
+      line-height:1.7;
+    ">
+      <li>Open the task link above.</li>
+      <li>Complete the action described by the task creator.</li>
+      <li>Make sure your work satisfies every requirement.</li>
+      <li>Take a clear screenshot showing your completed work.</li>
+      <li>Submit your proof below for creator review.</li>
+    </ol>
+
+  </div>
+
+<form method="POST"
+          action="/submit-task"
+          enctype="multipart/form-data">
+
+      <input type="hidden"
+             name="task_id"
+             value="{{TASK_ID}}">
+
+      <label for="proof">
+        Your explanation
+      </label>
+
+      <textarea
+        id="proof"
+        name="proof"
+        rows="5"
+        placeholder="Tell the task creator exactly what you completed..."
+        required></textarea>
+
+      <label for="screenshot">
+        Screenshot proof
+      </label>
+
+      <input
+        id="screenshot"
+        type="file"
+        name="screenshot"
+        accept="image/jpeg,image/png,image/webp"
+        required>
+
+      <small class="file-help">
+        Upload a clear screenshot showing your completed work.
+      </small>
+
+      <button type="submit"
+              class="primary-btn full-btn">
+        Submit Task for Review
+      </button>
+
+    </form>
+
+  </section>
+
+</main>
+
+</body>
+</html>

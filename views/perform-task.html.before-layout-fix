@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perform Task — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/tasks.html" class="logo">
+    Task<span>bright</span>
+  </a>
+</header>
+
+<main class="dashboard">
+
+  <a href="/tasks.html" class="back-link">
+    ← Back to Available Tasks
+  </a>
+
+  <section class="form-card">
+
+    <div class="task-detail-top">
+      <div>
+        <span class="task-category">Task</span>
+        <h1>{{TASK_TITLE}}</h1>
+      </div>
+
+      <strong>{{TASK_REWARD}}</strong>
+    </div>
+
+    <div class="task-action-link"
+         style="margin:20px 0;padding:18px;border-radius:12px;background:#f5f7fa;">
+
+      <h2>Task to Perform</h2>
+
+      <p>{{TASK_DESCRIPTION}}</p>
+
+      <a href="{{TASK_LINK}}"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="primary-btn">
+        🔗 Open Task Link
+      </a>
+
+    </div>
+
+    <div class="task-instructions">
+
+      <h2>How to complete this task</h2>
+
+      <ol>
+        <li>Open the task link above.</li>
+        <li>Complete exactly what the task creator requested.</li>
+        <li>Make sure your work is completed successfully.</li>
+        <li>Take a clear screenshot showing your completed work.</li>
+        <li>Explain what you completed below.</li>
+        <li>Upload your screenshot and submit it for review.</li>
+      </ol>
+
+    </div>
+
+    <div class="worker-warning">
+      ⚠️ <strong>Important:</strong>
+      Your submission will be reviewed by the task creator.
+      The reward is added to your Task Wallet only after approval.
+    </div>
+
+    <form method="POST"
+          action="/submit-task"
+          enctype="multipart/form-data">
+
+      <input type="hidden"
+             name="task_id"
+             value="{{TASK_ID}}">
+
+      <label for="proof">
+        Your explanation
+      </label>
+
+      <textarea
+        id="proof"
+        name="proof"
+        rows="5"
+        placeholder="Tell the task creator exactly what you completed..."
+        required></textarea>
+
+      <label for="screenshot">
+        Screenshot proof
+      </label>
+
+      <input
+        id="screenshot"
+        type="file"
+        name="screenshot"
+        accept="image/jpeg,image/png,image/webp"
+        required>
+
+      <small class="file-help">
+        Upload a clear screenshot showing your completed work.
+      </small>
+
+      <button type="submit"
+              class="primary-btn full-btn">
+        Submit Task for Review
+      </button>
+
+    </form>
+
+  </section>
+
+</main>
+
+</body>
+</html>

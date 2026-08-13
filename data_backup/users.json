@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "first_name": "Vikool",
+    "last_name": "Makama",
+    "email": "vikoolmakama@gmail.com",
+    "phone": "08131602092",
+    "password": "scrypt:32768:8:1$9yJXRsME9Yg3UK6Y$320724bd1b5dafe6b1e2051d4ebdd41cdb486e050eceec6e970e78fe76b2c5a47290809699decb5fdc3c397e3cc68fbaac07f275e4322bac621f09721f872751",
+    "referral_code": "",
+    "deposit_balance": 285.0,
+    "task_wallet": 100.0,
+    "referral_wallet": 0,
+    "activated": true
+  },
+  {
+    "id": 2,
+    "first_name": "Jimmy",
+    "last_name": "Makama",
+    "email": "jimmymakama130@gmail.com",
+    "phone": "09034960760",
+    "password": "scrypt:32768:8:1$IOjVnSUF7kspwo0S$9e3dcdd012d815a26f28edd3ce1da928579c7cb13a9432dea2ded643128bec1e2de22c30f6f40442dc55286911130a08aabccfe5e8cb14ade9bfd94f017115fd",
+    "referral_code": "",
+    "deposit_balance": 50.0,
+    "task_wallet": 21.0,
+    "referral_wallet": 0,
+    "activated": true
+  }
+]

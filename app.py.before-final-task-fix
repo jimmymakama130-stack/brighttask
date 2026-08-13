@@ -1,0 +1,1231 @@
+from flask import Flask, request, redirect, session, send_from_directory
+from werkzeug.security import generate_password_hash, check_password_hash
+from pathlib import Path
+import json
+import os
+
+app = Flask(__name__)
+
+app.secret_key = os.environ.get(
+    "TASKBRIGHT_SECRET",
+    "taskbright-development-secret-change-later"
+)
+
+BASE_DIR = Path(__file__).resolve().parent
+VIEWS_DIR = BASE_DIR / "views"
+DATA_DIR = BASE_DIR / "data"
+USERS_FILE = DATA_DIR / "users.json"
+DEPOSITS_FILE = DATA_DIR / "deposits.json"
+AIRTIME_FILE = DATA_DIR / "airtime.json"
+DEPOSIT_UPLOADS = BASE_DIR / "public" / "uploads" / "deposits"
+DEPOSIT_UPLOADS.mkdir(parents=True, exist_ok=True)
+SUBMISSION_UPLOADS = BASE_DIR / "public" / "uploads" / "submissions"
+SUBMISSION_UPLOADS.mkdir(parents=True, exist_ok=True)
+
+DATA_DIR.mkdir(exist_ok=True)
+
+
+
+@app.route("/css/<path:filename>")
+def css(filename):
+    return send_from_directory(BASE_DIR / "public" / "css", filename)
+
+def load_users():
+    if not USERS_FILE.exists():
+        return []
+
+    try:
+        return json.loads(USERS_FILE.read_text())
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def save_users(users):
+    USERS_FILE.write_text(
+        json.dumps(users, indent=2)
+    )
+
+
+def current_user():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return None
+
+    for user in load_users():
+        if user.get("id") == user_id:
+            return user
+
+    return None
+
+
+@app.route("/")
+def home():
+    return send_from_directory(VIEWS_DIR, "index.html")
+
+
+@app.route("/register", methods=["POST"])
+def register():
+    first_name = request.form.get("first_name", "").strip()
+    last_name = request.form.get("last_name", "").strip()
+    email = request.form.get("email", "").strip().lower()
+    phone = request.form.get("phone", "").strip()
+    password = request.form.get("password", "")
+    confirm_password = request.form.get("confirm_password", "")
+    referral_code = request.form.get("referral_code", "").strip()
+
+    if not all([first_name, last_name, email, phone, password]):
+        return "Please complete all required fields.", 400
+
+    if password != confirm_password:
+        return "Passwords do not match.", 400
+
+    users = load_users()
+
+    if any(user["email"] == email for user in users):
+        return "An account with this email already exists. Please log in.", 409
+
+    user_id = max(
+        [user.get("id", 0) for user in users],
+        default=0
+    ) + 1
+
+    user = {
+        "id": user_id,
+        "first_name": first_name,
+        "last_name": last_name,
+        "email": email,
+        "phone": phone,
+        "password": generate_password_hash(password),
+        "referral_code": referral_code,
+        "deposit_balance": 0,
+        "task_wallet": 0,
+        "referral_wallet": 0,
+        "activated": False
+    }
+
+    users.append(user)
+    save_users(users)
+
+    session.clear()
+    session["user_id"] = user_id
+
+    return redirect("/dashboard.html")
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    email = request.form.get("email", "").strip().lower()
+    password = request.form.get("password", "")
+
+    user = next(
+        (
+            user for user in load_users()
+            if user.get("email") == email
+        ),
+        None
+    )
+
+    if not user or not check_password_hash(
+        user.get("password", ""),
+        password
+    ):
+        return "Invalid email or password.", 401
+
+    session.clear()
+    session["user_id"] = user["id"]
+
+    return redirect("/dashboard.html")
+
+
+
+TASKS_FILE = DATA_DIR / "tasks.json"
+
+def load_tasks():
+    if not TASKS_FILE.exists():
+        return []
+    try:
+        return json.loads(TASKS_FILE.read_text())
+    except (json.JSONDecodeError, OSError):
+        return []
+
+def save_tasks(tasks):
+    TASKS_FILE.write_text(json.dumps(tasks, indent=2))
+
+
+@app.route("/dashboard.html")
+def dashboard():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    page = (VIEWS_DIR / "dashboard.html").read_text()
+
+    deposit_balance = float(user.get("deposit_balance", 0) or 0)
+    task_wallet = float(user.get("task_wallet", 0) or 0)
+    referral_wallet = float(user.get("referral_wallet", 0) or 0)
+
+    # Replace dedicated placeholders if they exist.
+    page = page.replace(
+        "{{DEPOSIT_BALANCE}}",
+        f"{deposit_balance:,.2f}"
+    )
+    page = page.replace(
+        "{{TASK_WALLET}}",
+        f"{task_wallet:,.2f}"
+    )
+    page = page.replace(
+        "{{REFERRAL_WALLET}}",
+        f"{referral_wallet:,.2f}"
+    )
+
+    return page
+
+
+@app.route("/create-task", methods=["POST"])
+def create_task():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    task_type = request.form.get("task_type", "").strip()
+    title = request.form.get("title", "").strip()
+    description = request.form.get("description", "").strip()
+    link = request.form.get("link", "").strip()
+    workers = request.form.get("workers", "").strip()
+
+    try:
+        workers = int(workers)
+    except ValueError:
+        return "Invalid number of workers.", 400
+
+    if workers < 5:
+        return "Minimum number of workers is 5.", 400
+
+    costs = {
+        "telegram_bot": 60,
+        "whatsapp_telegram": 14,
+        "custom": 85,
+        "app_install": 100,
+        "youtube_subscribers": 20,
+        "facebook_followers": 14,
+        "website_signups": 35,
+        "instagram_followers": 13,
+        "tiktok_followers": 13,
+        "social_likes": 10,
+        "social_comments": 13
+    }
+
+    cost_per_worker = costs.get(task_type)
+
+    if cost_per_worker is None:
+        return "Invalid task type.", 400
+
+    total_cost = cost_per_worker * workers
+
+    users = load_users()
+
+    for stored_user in users:
+        if stored_user.get("id") == user.get("id"):
+            balance = float(stored_user.get("deposit_balance", 0))
+
+            if balance < total_cost:
+                return (
+                    f"Insufficient Deposit Balance. "
+                    f"You need ₦{total_cost:,.0f}.",
+                    400
+                )
+
+            stored_user["deposit_balance"] = round(
+                balance - total_cost, 2
+            )
+
+            tasks = load_tasks()
+
+            tasks.append({
+                "id": os.urandom(8).hex(),
+                "creator_id": stored_user.get("id"),
+                "creator_name": (
+                    f"{stored_user.get('first_name', '')} "
+                    f"{stored_user.get('last_name', '')}"
+                ).strip(),
+                "task_type": task_type,
+                "title": title,
+                "description": description,
+                "link": link,
+                "workers": workers,
+                "cost_per_worker": cost_per_worker,
+                "total_cost": total_cost,
+                "submitted": 0,
+                "approved": 0,
+                "status": "Active"
+            })
+
+            save_users(users)
+            save_tasks(tasks)
+
+            return redirect("/my-tasks.html")
+
+    return "User account not found.", 404
+
+
+def load_deposits():
+    if not DEPOSITS_FILE.exists():
+        return []
+    try:
+        return json.loads(DEPOSITS_FILE.read_text())
+    except (json.JSONDecodeError, OSError):
+        return []
+
+def save_deposits(deposits):
+    DEPOSITS_FILE.write_text(json.dumps(deposits, indent=2))
+
+
+@app.route("/deposit", methods=["POST"])
+def submit_deposit():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    try:
+        amount = float(request.form.get("amount", "0"))
+    except ValueError:
+        return "Invalid deposit amount.", 400
+
+    if amount < 200:
+        return "Minimum deposit is ₦200.", 400
+
+    payment_method = request.form.get("payment_method", "").strip()
+    sender_name = request.form.get("sender_name", "").strip()
+    screenshot = request.files.get("screenshot")
+
+    if not payment_method or not sender_name:
+        return "Please complete all deposit details.", 400
+
+    if not screenshot or not screenshot.filename:
+        return "Transaction screenshot is required.", 400
+
+    extension = Path(screenshot.filename).suffix.lower()
+
+    if extension not in {".jpg", ".jpeg", ".png", ".webp"}:
+        return "Only JPG, JPEG, PNG and WEBP screenshots are allowed.", 400
+
+    deposits = load_deposits()
+
+    deposit_id = os.urandom(8).hex()
+    filename = f"{deposit_id}{extension}"
+
+    screenshot.save(DEPOSIT_UPLOADS / filename)
+
+    deposits.append({
+        "id": deposit_id,
+        "user_id": user.get("id"),
+        "user_name": (
+            f"{user.get('first_name', '')} "
+            f"{user.get('last_name', '')}"
+        ).strip(),
+        "amount": amount,
+        "payment_method": payment_method,
+        "sender_name": sender_name,
+        "screenshot": f"/uploads/deposits/{filename}",
+        "status": "Pending"
+    })
+
+    save_deposits(deposits)
+
+    return redirect("/deposit.html")
+
+
+@app.route("/deposit-history")
+def deposit_history():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    deposits = [
+        d for d in load_deposits()
+        if d.get("user_id") == user.get("id")
+    ]
+
+    items = ""
+
+    for d in reversed(deposits):
+        items += f"""
+        <article class="admin-request-card">
+          <div class="request-header">
+            <div>
+              <span class="pending-status">{d.get("status")}</span>
+              <h2>₦{d.get("amount", 0):,.0f} Deposit</h2>
+            </div>
+          </div>
+
+          <div class="request-details">
+            <div>
+              <span>Payment Method</span>
+              <strong>{d.get("payment_method", "")}</strong>
+            </div>
+            <div>
+              <span>Sender Name</span>
+              <strong>{d.get("sender_name", "")}</strong>
+            </div>
+          </div>
+        </article>
+        """
+
+    if not items:
+        items = """
+        <div class="empty-tasks">
+          <div class="empty-icon">₦</div>
+          <h2>No deposits yet</h2>
+          <p>Your deposit requests will appear here.</p>
+        </div>
+        """
+
+    return f"""
+    <section class="admin-request-list">
+      {items}
+    </section>
+    """
+
+
+@app.route("/admin-deposits.html")
+def admin_deposits():
+    if not session.get("admin"):
+        return redirect("/admin-login.html")
+
+    page = (VIEWS_DIR / "admin-deposits.html").read_text()
+    deposits = load_deposits()
+    cards = ""
+
+    for d in reversed(deposits):
+        if d.get("status") != "Pending":
+            continue
+
+        cards += f"""
+        <article class="admin-request-card">
+
+          <div class="request-header">
+            <div>
+              <span class="pending-status">Pending</span>
+              <h2>₦{d.get("amount", 0):,.0f} Deposit</h2>
+            </div>
+          </div>
+
+          <div class="request-details">
+            <div>
+              <span>User</span>
+              <strong>{d.get("user_name", "User")}</strong>
+            </div>
+
+            <div>
+              <span>Payment Method</span>
+              <strong>{d.get("payment_method", "")}</strong>
+            </div>
+
+            <div>
+              <span>Sender Name</span>
+              <strong>{d.get("sender_name", "")}</strong>
+            </div>
+          </div>
+
+          <div class="transaction-proof">
+            📸
+            <a href="{d.get("screenshot", "#")}" target="_blank">
+              View Transaction Screenshot
+            </a>
+          </div>
+
+          <div class="admin-review-actions">
+
+            <form method="POST" action="/admin-review-deposit">
+              <input type="hidden" name="deposit_id"
+                     value="{d.get("id")}">
+              <input type="hidden" name="decision"
+                     value="approve">
+              <button class="approve-btn" type="submit">
+                ✓ Approve Deposit
+              </button>
+            </form>
+
+            <form method="POST" action="/admin-review-deposit">
+              <input type="hidden" name="deposit_id"
+                     value="{d.get("id")}">
+              <input type="hidden" name="decision"
+                     value="reject">
+              <button class="reject-btn" type="submit">
+                ✕ Reject Deposit
+              </button>
+            </form>
+
+          </div>
+
+        </article>
+        """
+
+    if not cards:
+        cards = """
+        <div class="empty-tasks">
+          <div class="empty-icon">✓</div>
+          <h2>No pending deposits</h2>
+          <p>New deposit requests will appear here.</p>
+        </div>
+        """
+
+    start = page.find('<section class="admin-request-list">')
+
+    if start != -1:
+        end = page.find("</section>", start)
+
+        if end != -1:
+            page = (
+                page[:start]
+                + '<section class="admin-request-list">'
+                + cards
+                + "</section>"
+                + page[end + len("</section>"):]
+            )
+
+    return page
+
+
+@app.route("/admin-review-deposit", methods=["POST"])
+def admin_review_deposit():
+    if not session.get("admin"):
+        return redirect("/admin-login.html")
+
+    deposit_id = request.form.get("deposit_id", "").strip()
+    decision = request.form.get("decision", "").strip()
+
+    if decision not in ("approve", "reject"):
+        return "Invalid decision.", 400
+
+    deposits = load_deposits()
+
+    deposit = next(
+        (d for d in deposits if d.get("id") == deposit_id),
+        None
+    )
+
+    if not deposit:
+        return "Deposit not found.", 404
+
+    if deposit.get("status") != "Pending":
+        return "This deposit has already been reviewed.", 400
+
+    if decision == "reject":
+        deposit["status"] = "Rejected"
+
+    else:
+        users = load_users()
+
+        user = next(
+            (
+                u for u in users
+                if u.get("id") == deposit.get("user_id")
+            ),
+            None
+        )
+
+        if not user:
+            return "User not found.", 404
+
+        amount = float(deposit.get("amount", 0))
+
+        user["deposit_balance"] = round(
+            float(user.get("deposit_balance", 0)) + amount,
+            2
+        )
+
+        deposit["status"] = "Approved"
+
+        save_users(users)
+
+    save_deposits(deposits)
+
+    return redirect("/admin-deposits.html")
+
+
+@app.route("/activate", methods=["GET", "POST"])
+def activate():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    if user.get("activated", False):
+        return redirect("/dashboard.html")
+
+    if request.method == "GET":
+        return send_from_directory(VIEWS_DIR, "activate.html")
+
+    users = load_users()
+
+    stored_user = next(
+        (u for u in users if u.get("id") == user.get("id")),
+        None
+    )
+
+    if not stored_user:
+        return "User account not found.", 404
+
+    balance = float(stored_user.get("deposit_balance", 0))
+
+    if balance < 300:
+        page = (VIEWS_DIR / "activate.html").read_text()
+
+        error = """
+        <div class="activation-error">
+          ⚠️ <strong>Insufficient Deposit Balance</strong>
+          <p>
+            You need at least ₦300 in your Deposit Balance
+            to activate your account.
+          </p>
+          <a href="/deposit.html" class="secondary-btn">
+            Deposit Funds
+          </a>
+        </div>
+        """
+
+        marker = '<form method="POST" action="/activate">'
+
+        if marker in page:
+            page = page.replace(marker, error + marker, 1)
+
+        return page, 400
+
+    stored_user["deposit_balance"] = round(balance - 300, 2)
+    stored_user["activated"] = True
+    stored_user["task_wallet"] = round(
+        float(stored_user.get("task_wallet", 0)) + 100,
+        2
+    )
+
+    save_users(users)
+
+    return redirect("/dashboard.html")
+
+
+@app.route("/task-details.html")
+def task_details():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    if not user.get("activated", False):
+        return redirect("/activate")
+
+    task_id = request.args.get("id", "").strip()
+
+    if not task_id:
+        return redirect("/tasks.html")
+
+    tasks = load_tasks()
+
+    task = next(
+        (t for t in tasks if str(t.get("id")) == str(task_id)),
+        None
+    )
+
+    if not task:
+        return "Task not found.", 404
+
+    if task.get("status", "Active") != "Active":
+        return "This task is no longer available.", 400
+
+    if str(task.get("creator_id")) == str(user.get("id")):
+        return "You cannot perform your own task.", 403
+
+    from markupsafe import escape
+
+    page = (VIEWS_DIR / "task-details.html").read_text()
+
+    title = task.get("title") or str(
+        task.get("task_type", "Task")
+    ).replace("_", " ").title()
+
+    reward = float(task.get("cost_per_worker", 0) or 0)
+    workers = int(task.get("workers", 0) or 0)
+    description = task.get("description", "")
+    link = task.get("link", "")
+
+    replacements = {
+        "{{TASK_ID}}": str(task.get("id", "")),
+        "{{TASK_TITLE}}": str(escape(title)),
+        "{{TASK_REWARD}}": f"₦{reward:,.2f}",
+        "{{TASK_WORKERS}}": str(workers),
+        "{{TASK_DESCRIPTION}}": str(escape(description)),
+        "{{TASK_LINK}}": str(escape(link)),
+    }
+
+    for key, value in replacements.items():
+        page = page.replace(key, value)
+
+    return page
+
+
+@app.route("/perform-task.html")
+def perform_task():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    if not user.get("activated", False):
+        return redirect("/activate")
+
+    task_id = request.args.get("id", "").strip()
+
+    if not task_id:
+        return redirect("/tasks.html")
+
+    tasks = load_tasks()
+
+    task = next(
+        (t for t in tasks if str(t.get("id")) == str(task_id)),
+        None
+    )
+
+    if not task:
+        return "Task not found.", 404
+
+    if task.get("status", "Active") != "Active":
+        return "This task is no longer available.", 400
+
+    if str(task.get("creator_id")) == str(user.get("id")):
+        return "You cannot perform your own task.", 403
+
+    from markupsafe import escape
+
+    page = (VIEWS_DIR / "perform-task.html").read_text()
+
+    title = task.get("title") or str(
+        task.get("task_type", "Task")
+    ).replace("_", " ").title()
+
+    reward = float(task.get("cost_per_worker", 0) or 0)
+    workers = int(task.get("workers", 0) or 0)
+    description = task.get("description", "")
+    link = task.get("link", "")
+
+    replacements = {
+        "{{TASK_ID}}": str(task.get("id", "")),
+        "{{TASK_TITLE}}": str(escape(title)),
+        "{{TASK_REWARD}}": f"₦{reward:,.2f}",
+        "{{TASK_WORKERS}}": str(workers),
+        "{{TASK_DESCRIPTION}}": str(escape(description)),
+        "{{TASK_LINK}}": str(escape(link)),
+    }
+
+    for key, value in replacements.items():
+        page = page.replace(key, value)
+
+    return page
+
+
+@app.route("/admin-login", methods=["POST"])
+def admin_login():
+    email = request.form.get("email", "").strip().lower()
+    password = request.form.get("password", "")
+
+    if email != "admin@taskbright.com" or password != "Admin@9090":
+        return "Invalid admin email or password.", 401
+
+    session.clear()
+    session["admin"] = True
+
+    return redirect("/admin-dashboard.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login.html")
+
+
+
+AIRTIME_FILE = DATA_DIR / "airtime_requests.json"
+
+
+def load_airtime_requests():
+    if not AIRTIME_FILE.exists():
+        return []
+
+    try:
+        return json.loads(AIRTIME_FILE.read_text())
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def save_airtime_requests(requests):
+    AIRTIME_FILE.write_text(json.dumps(requests, indent=2))
+
+
+@app.route("/airtime", methods=["POST"])
+def airtime_request():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    if not user.get("activated", False):
+        return redirect("/activate")
+
+    network = request.form.get("network", "").strip()
+    phone = request.form.get("phone", "").strip()
+    amount_raw = request.form.get("amount", "").strip()
+    wallet = request.form.get("wallet", "").strip()
+
+    if network not in ["MTN", "Airtel", "GLO", "9mobile"]:
+        return "Invalid network.", 400
+
+    if not phone.isdigit() or len(phone) != 11:
+        return "Enter a valid 11-digit phone number.", 400
+
+    try:
+        amount = float(amount_raw)
+    except ValueError:
+        return "Invalid amount.", 400
+
+    if amount < 100:
+        return "Minimum airtime purchase is ₦100.", 400
+
+    if wallet not in ["task", "referral"]:
+        return "Select a valid wallet.", 400
+
+    requests = load_airtime_requests()
+
+    airtime_id = str(max(
+        [int(x.get("id", 0)) for x in requests if str(x.get("id", "")).isdigit()] or [0]
+    ) + 1)
+
+    airtime = {
+        "id": airtime_id,
+        "user_id": user["id"],
+        "name": f'{user.get("first_name", "")} {user.get("last_name", "")}'.strip(),
+        "email": user.get("email", ""),
+        "network": network,
+        "phone": phone,
+        "amount": round(amount, 2),
+        "wallet": wallet,
+        "status": "Pending"
+    }
+
+    requests.append(airtime)
+    save_airtime_requests(requests)
+
+    return redirect("/airtime-history.html")
+
+
+@app.route("/airtime-history.html")
+def airtime_history():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    requests = [
+        item for item in load_airtime_requests()
+        if item.get("user_id") == user.get("id")
+    ]
+
+    history_html = (VIEWS_DIR / "airtime-history.html").read_text()
+
+    cards = ""
+
+    for item in reversed(requests):
+        status = item.get("status", "Pending")
+
+        cards += f"""
+        <article class="admin-request-card airtime-history-card">
+          <div class="request-header">
+            <div>
+              <span class="pending-status">{status}</span>
+              <h2>₦{float(item.get("amount", 0)):,.0f} Airtime</h2>
+            </div>
+          </div>
+
+          <div class="request-details">
+            <div>
+              <span>Network</span>
+              <strong>{item.get("network", "")}</strong>
+            </div>
+
+            <div>
+              <span>Phone Number</span>
+              <strong>{item.get("phone", "")}</strong>
+            </div>
+
+            <div>
+              <span>Wallet</span>
+              <strong>{item.get("wallet", "").title()} Wallet</strong>
+            </div>
+
+            <div>
+              <span>Status</span>
+              <strong>{status}</strong>
+            </div>
+          </div>
+        </article>
+        """
+
+    if not cards:
+        cards = """
+        <div class="empty-tasks">
+          <div class="empty-icon">📱</div>
+          <h2>No airtime requests yet</h2>
+          <p>Your airtime requests will appear here after you make a purchase.</p>
+        </div>
+        """
+
+    history_html = history_html.replace(
+        '<section class="airtime-history-list" id="airtimeHistory">',
+        '<section class="airtime-history-list" id="airtimeHistory">' + cards,
+        1
+    )
+
+    return history_html
+
+
+@app.route("/admin/airtime/<request_id>/<action>", methods=["POST"])
+def admin_airtime_action(request_id, action):
+    if not session.get("admin"):
+        return redirect("/admin-login.html")
+
+    if action not in ["approve", "reject"]:
+        return "Invalid action.", 400
+
+    requests = load_airtime_requests()
+
+    target = next(
+        (item for item in requests if str(item.get("id")) == str(request_id)),
+        None
+    )
+
+    if not target:
+        return "Airtime request not found.", 404
+
+    if target.get("status") != "Pending":
+        return "This request has already been reviewed.", 400
+
+    if action == "reject":
+        target["status"] = "Rejected"
+        save_airtime_requests(requests)
+        return redirect("/admin-airtime.html")
+
+    users = load_users()
+
+    stored_user = next(
+        (u for u in users if u.get("id") == target.get("user_id")),
+        None
+    )
+
+    if not stored_user:
+        return "User account not found.", 404
+
+    wallet_key = "task_wallet" if target["wallet"] == "task" else "referral_wallet"
+    balance = float(stored_user.get(wallet_key, 0))
+    amount = float(target["amount"])
+
+    if balance < amount:
+        return "User does not have enough wallet balance to approve this request.", 400
+
+    stored_user[wallet_key] = round(balance - amount, 2)
+    target["status"] = "Approved"
+
+    save_users(users)
+    save_airtime_requests(requests)
+
+    return redirect("/admin-airtime.html")
+
+
+@app.route("/admin-airtime.html")
+def admin_airtime():
+    if not session.get("admin"):
+        return redirect("/admin-login.html")
+
+    requests = load_airtime_requests()
+
+    page = (VIEWS_DIR / "admin-airtime.html").read_text()
+
+    cards = ""
+
+    for item in reversed(requests):
+        status = item.get("status", "Pending")
+
+        if status != "Pending":
+            continue
+
+        cards += f"""
+        <article class="admin-request-card">
+
+          <div class="request-header">
+            <div>
+              <span class="pending-status">Pending</span>
+              <h2>₦{float(item.get("amount", 0)):,.0f} Airtime</h2>
+            </div>
+          </div>
+
+          <div class="request-details">
+
+            <div>
+              <span>User</span>
+              <strong>{item.get("name", "User")}</strong>
+            </div>
+
+            <div>
+              <span>Network</span>
+              <strong>{item.get("network", "")}</strong>
+            </div>
+
+            <div>
+              <span>Phone number</span>
+              <strong>{item.get("phone", "")}</strong>
+            </div>
+
+            <div>
+              <span>Amount</span>
+              <strong>₦{float(item.get("amount", 0)):,.0f}</strong>
+            </div>
+
+            <div>
+              <span>Pay from</span>
+              <strong>{item.get("wallet", "").title()} Wallet</strong>
+            </div>
+
+          </div>
+
+          <div class="admin-review-actions">
+
+            <form method="POST"
+                  action="/admin/airtime/{item.get('id')}/approve">
+              <button type="submit" class="approve-btn">
+                ✓ Approve Airtime
+              </button>
+            </form>
+
+            <form method="POST"
+                  action="/admin/airtime/{item.get('id')}/reject">
+              <button type="submit" class="reject-btn">
+                ✕ Reject Airtime
+              </button>
+            </form>
+
+          </div>
+
+        </article>
+        """
+
+    if not cards:
+        cards = """
+        <div class="empty-tasks">
+          <div class="empty-icon">📱</div>
+          <h2>No pending airtime requests</h2>
+          <p>New user requests will appear here when submitted.</p>
+        </div>
+        """
+
+    marker = '<section class="admin-request-list">'
+
+    start = page.find(marker)
+    if start != -1:
+        end = page.find('</section>', start)
+
+        if end != -1:
+            page = (
+                page[:start]
+                + marker
+                + cards
+                + '</section>'
+                + page[end + len('</section>'):]
+            )
+
+    return page
+
+
+@app.route("/uploads/<path:filename>")
+def uploads(filename):
+    return send_from_directory(
+        BASE_DIR / "public" / "uploads",
+        filename
+    )
+
+
+@app.route("/tasks.html")
+def tasks():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    if not user.get("activated", False):
+        return redirect("/activate")
+
+    tasks = load_tasks()
+
+    cards = ""
+
+    for task in reversed(tasks):
+        if task.get("status") != "Active":
+            continue
+
+        if task.get("creator_id") == user.get("id"):
+            continue
+
+        cards += f"""
+        <article class="market-task-card">
+
+          <div class="market-task-top">
+            <div>
+              <span class="task-category">
+                {task.get("task_type", "Other").replace("_", " ").title()}
+              </span>
+              <h2>{task.get("title", "Task")}</h2>
+            </div>
+
+            <strong>₦{task.get("cost_per_worker", 0):,}</strong>
+          </div>
+
+          <p>{task.get("description", "")}</p>
+
+          <div class="market-task-info">
+            <span>👥 {task.get("workers", 0)} workers</span>
+            <span>📸 Proof required</span>
+          </div>
+
+          <a href="/task-details.html?id={task.get("id")}"
+             class="primary-btn full-btn">
+            View & Perform Task
+          </a>
+
+        </article>
+        """
+
+    if not cards:
+        cards = """
+        <div class="empty-tasks">
+          <div class="empty-icon">✓</div>
+          <h2>No tasks available</h2>
+          <p>Tasks created by users will appear here when they become available.</p>
+        </div>
+        """
+
+    page = (VIEWS_DIR / "tasks.html").read_text()
+
+    marker = '<section class="marketplace-list">'
+
+    start = page.find(marker)
+
+    if start != -1:
+        end = page.find("</section>", start)
+
+        if end != -1:
+            page = (
+                page[:start]
+                + marker
+                + cards
+                + "</section>"
+                + page[end + len("</section>"):]
+            )
+
+    return page
+
+
+@app.route("/<page>")
+def page(page):
+    if not page.endswith(".html"):
+        page += ".html"
+
+    file_path = VIEWS_DIR / page
+
+    if not file_path.is_file():
+        return "Page not found", 404
+
+    return send_from_directory(VIEWS_DIR, page)
+
+
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )
+
+@app.route("/submit-task", methods=["POST"])
+def submit_task():
+    user = current_user()
+
+    if not user:
+        return redirect("/login.html")
+
+    if not user.get("activated", False):
+        return redirect("/activate")
+
+    task_id = request.form.get("task_id", "").strip()
+    proof = request.form.get("proof", "").strip()
+    screenshot = request.files.get("screenshot")
+
+    if not task_id:
+        return "Task ID is required.", 400
+
+    if not proof:
+        return "Please enter your proof.", 400
+
+    if not screenshot or not screenshot.filename:
+        return "Screenshot proof is required.", 400
+
+    extension = Path(screenshot.filename).suffix.lower()
+
+    if extension not in {".jpg", ".jpeg", ".png", ".webp"}:
+        return "Only JPG, JPEG, PNG and WEBP screenshots are allowed.", 400
+
+    tasks = load_tasks()
+
+    task = next(
+        (t for t in tasks if str(t.get("id")) == str(task_id)),
+        None
+    )
+
+    if not task:
+        return "Task not found.", 404
+
+    if task.get("status", "Active") != "Active":
+        return "This task is no longer active.", 400
+
+    if str(task.get("creator_id")) == str(user.get("id")):
+        return "You cannot submit your own task.", 403
+
+    submissions = load_submissions()
+
+    submission_id = os.urandom(8).hex()
+    filename = f"{submission_id}{extension}"
+
+    screenshot.save(SUBMISSION_UPLOADS / filename)
+
+    submission = {
+        "id": submission_id,
+        "task_id": task.get("id"),
+        "task_title": task.get("title", "Task"),
+        "creator_id": task.get("creator_id"),
+        "worker_id": user.get("id"),
+        "worker_name": (
+            f'{user.get("first_name", "")} '
+            f'{user.get("last_name", "")}'
+        ).strip(),
+        "worker_email": user.get("email", ""),
+        "proof": proof,
+        "screenshot": f"/uploads/submissions/{filename}",
+        "status": "Pending"
+    }
+
+    submissions.append(submission)
+    save_submissions(submissions)
+
+    task["submitted"] = int(task.get("submitted", 0)) + 1
+    save_tasks(tasks)
+
+    return redirect("/tasks.html")

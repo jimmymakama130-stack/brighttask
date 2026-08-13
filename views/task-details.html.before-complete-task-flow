@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Details — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/tasks.html" class="logo">Task<span>bright</span></a>
+</header>
+
+<main class="dashboard">
+
+  <a href="/tasks.html" class="back-link">← Back to Tasks</a>
+
+  <section class="task-details-card">
+
+    <div class="task-detail-header">
+      <div>
+        <span class="task-status">Available</span>
+        <h1>Social Media Engagement</h1>
+      </div>
+
+      <div class="task-reward">
+        <small>Reward</small>
+        <strong>₦250</strong>
+      </div>
+    </div>
+
+    <div class="task-info-grid">
+      <div>
+        <span>Workers needed</span>
+        <strong>15</strong>
+      </div>
+
+      <div>
+        <span>Proof</span>
+        <strong>Screenshot</strong>
+      </div>
+
+      <div>
+        <span>Estimated time</span>
+        <strong>5 minutes</strong>
+      </div>
+    </div>
+
+    <div class="task-instructions">
+
+      <h2>Task Instructions</h2>
+
+      <ol>
+        <li>Open the required social media page.</li>
+        <li>Complete the action described by the task creator.</li>
+        <li>Make sure your work satisfies every requirement.</li>
+        <li>Take a clear screenshot showing your completed work.</li>
+        <li>Submit the screenshot for review.</li>
+      </ol>
+
+    </div>
+
+    <div class="task-detail-warning">
+      ⚠️ <strong>Before you submit:</strong>
+      Make sure your proof clearly shows that you completed the task.
+      Incorrect or incomplete work may be rejected by the task creator.
+    </div>
+
+    <a href="/perform-task.html?id={{TASK_ID}}" class="primary-btn full-btn">
+      Start Task
+    </a>
+
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Create Account — Taskbright</title>
+
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    :root {
+      --reg-bg: #f7f8fc;
+      --reg-text: #111827;
+      --reg-muted: #667085;
+      --reg-primary: #635bff;
+      --reg-border: #e5e7ef;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--reg-bg);
+      color: var(--reg-text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .register-header {
+      width: min(1180px, calc(100% - 40px));
+      height: 78px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .register-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #111827;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+
+    .register-brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--reg-primary);
+      color: white;
+      font-size: 16px;
+      box-shadow: 0 8px 20px rgba(99, 91, 255, .22);
+    }
+
+    .register-brand em {
+      color: var(--reg-primary);
+      font-style: normal;
+    }
+
+    .register-back {
+      color: var(--reg-muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .register-page {
+      width: min(1050px, calc(100% - 30px));
+      margin: auto;
+      min-height: calc(100vh - 78px);
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      align-items: center;
+      gap: 80px;
+      padding: 35px 0 65px;
+    }
+
+    .register-intro h1 {
+      max-width: 500px;
+      margin: 18px 0 14px;
+      font-size: clamp(38px, 5vw, 57px);
+      line-height: 1;
+      letter-spacing: -3px;
+    }
+
+    .register-intro h1 em {
+      color: var(--reg-primary);
+      font-style: normal;
+    }
+
+    .register-intro > p {
+      max-width: 440px;
+      color: var(--reg-muted);
+      font-size: 13px;
+      line-height: 1.75;
+      margin: 0;
+    }
+
+    .register-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #eeedff;
+      color: var(--reg-primary);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .register-badge span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--reg-primary);
+    }
+
+    .register-benefits {
+      margin-top: 28px;
+      display: grid;
+      gap: 13px;
+    }
+
+    .register-benefit {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .register-benefit-icon {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: white;
+      border: 1px solid var(--reg-border);
+      color: var(--reg-primary);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .register-benefit span {
+      color: var(--reg-muted);
+      font-size: 11px;
+    }
+
+    .register-card {
+      width: 100%;
+      max-width: 470px;
+      margin-left: auto;
+      padding: 31px;
+      background: white;
+      border: 1px solid var(--reg-border);
+      border-radius: 22px;
+      box-shadow: 0 25px 70px rgba(30, 36, 60, .08);
+    }
+
+    .register-card-header {
+      margin-bottom: 23px;
+    }
+
+    .register-card-header h2 {
+      margin: 0 0 7px;
+      font-size: 24px;
+      letter-spacing: -.8px;
+    }
+
+    .register-card-header p {
+      margin: 0;
+      color: var(--reg-muted);
+      font-size: 11px;
+    }
+
+    .register-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+    }
+
+    .register-group {
+      margin-bottom: 15px;
+    }
+
+    .register-group label {
+      display: block;
+      margin-bottom: 7px;
+      color: #344054;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .register-group input {
+      width: 100%;
+      height: 45px;
+      padding: 0 12px;
+      border: 1px solid var(--reg-border);
+      border-radius: 10px;
+      background: #fbfcfe;
+      color: #111827;
+      font: inherit;
+      font-size: 12px;
+      outline: none;
+      transition: .2s ease;
+    }
+
+    .register-group input:focus {
+      background: white;
+      border-color: var(--reg-primary);
+      box-shadow: 0 0 0 3px rgba(99, 91, 255, .09);
+    }
+
+    .referral-note {
+      margin: 2px 0 16px;
+      padding: 11px 12px;
+      background: #f7f8fc;
+      border-radius: 9px;
+      color: #667085;
+      font-size: 9px;
+      line-height: 1.5;
+    }
+
+    .register-submit {
+      width: 100%;
+      height: 49px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--reg-primary);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(99, 91, 255, .2);
+      transition: .2s ease;
+    }
+
+    .register-submit:hover {
+      transform: translateY(-1px);
+      background: #5148e5;
+    }
+
+    .terms {
+      margin: 16px 0 0;
+      color: #98a2b3;
+      text-align: center;
+      font-size: 9px;
+      line-height: 1.6;
+    }
+
+    .terms a {
+      color: var(--reg-primary);
+      font-weight: 700;
+    }
+
+    .login-prompt {
+      margin-top: 21px;
+      padding-top: 19px;
+      border-top: 1px solid var(--reg-border);
+      text-align: center;
+      color: var(--reg-muted);
+      font-size: 11px;
+    }
+
+    .login-prompt a {
+      color: var(--reg-primary);
+      font-weight: 800;
+    }
+
+    @media (max-width: 800px) {
+      .register-page {
+        grid-template-columns: 1fr;
+        gap: 35px;
+        padding-top: 25px;
+      }
+
+      .register-intro {
+        text-align: center;
+      }
+
+      .register-intro > p {
+        margin: auto;
+      }
+
+      .register-benefits {
+        justify-content: center;
+      }
+
+      .register-card {
+        margin: auto;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .register-header {
+        width: calc(100% - 26px);
+      }
+
+      .register-back {
+        display: none;
+      }
+
+      .register-page {
+        width: calc(100% - 26px);
+      }
+
+      .register-intro h1 {
+        font-size: 42px;
+        letter-spacing: -2.5px;
+      }
+
+      .register-card {
+        padding: 23px 18px;
+        border-radius: 18px;
+      }
+
+      .register-form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="register-header">
+
+    <a href="/" class="register-brand">
+      <span class="register-brand-mark">T</span>
+      <span>Task<em>bright</em></span>
+    </a>
+
+    <a href="/" class="register-back">
+      ← Back to home
+    </a>
+
+  </header>
+
+
+  <main class="register-page">
+
+    <section class="register-intro">
+
+      <div class="register-badge">
+        <span></span>
+        JOIN TASKBRIGHT
+      </div>
+
+      <h1>
+        Your journey to
+        <em>earn more</em>
+        starts here.
+      </h1>
+
+      <p>
+        Create your free account and get access to tasks, rewards,
+        your personal wallet, referrals, and more.
+      </p>
+
+      <div class="register-benefits">
+
+        <div class="register-benefit">
+          <span class="register-benefit-icon">✓</span>
+          <span>Complete simple tasks and earn rewards</span>
+        </div>
+
+        <div class="register-benefit">
+          <span class="register-benefit-icon">₦</span>
+          <span>Build your wallet as you complete approved tasks</span>
+        </div>
+
+        <div class="register-benefit">
+          <span class="register-benefit-icon">↗</span>
+          <span>Invite others and earn referral rewards</span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="register-card">
+
+      <div class="register-card-header">
+        <h2>Create your account</h2>
+        <p>It only takes a minute to get started.</p>
+      </div>
+
+      <form action="/register" method="POST">
+
+        <div class="register-form-row">
+
+          <div class="register-group">
+            <label for="first_name">First name</label>
+
+            <input
+              id="first_name"
+              name="first_name"
+              type="text"
+              placeholder="First name"
+              autocomplete="given-name"
+              required
+            >
+          </div>
+
+          <div class="register-group">
+            <label for="last_name">Last name</label>
+
+            <input
+              id="last_name"
+              name="last_name"
+              type="text"
+              placeholder="Last name"
+              autocomplete="family-name"
+              required
+            >
+          </div>
+
+        </div>
+
+
+        <div class="register-group">
+
+          <label for="email">Email address</label>
+
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          >
+
+        </div>
+
+
+        <div class="register-group">
+
+          <label for="phone">Phone number</label>
+
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            placeholder="08012345678"
+            autocomplete="tel"
+            required
+          >
+
+        </div>
+
+
+        <div class="register-form-row">
+
+          <div class="register-group">
+
+            <label for="password">Password</label>
+
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Create password"
+              autocomplete="new-password"
+              required
+            >
+
+          </div>
+
+          <div class="register-group">
+
+            <label for="confirm_password">Confirm</label>
+
+            <input
+              id="confirm_password"
+              name="confirm_password"
+              type="password"
+              placeholder="Repeat password"
+              autocomplete="new-password"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="register-group">
+
+          <label for="referral_code">Referral code <span>(optional)</span></label>
+
+          <input
+            id="referral_code"
+            name="referral_code"
+            type="text"
+            placeholder="Enter referral code"
+          >
+
+        </div>
+
+
+        <div class="referral-note">
+          Have a referral code? Add it above so your referral can be
+          properly connected to your account.
+        </div>
+
+
+        <button type="submit" class="register-submit">
+          Create Account →
+        </button>
+
+      </form>
+
+
+      <p class="terms">
+        By creating an account, you agree to our
+        <a href="#">Terms</a> and
+        <a href="#">Privacy Policy</a>.
+      </p>
+
+
+      <div class="login-prompt">
+        Already have an account?
+        <a href="/login.html">Log in</a>
+      </div>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "1",
+    "user_id": 2,
+    "name": "Jimmy Makama",
+    "email": "jimmymakama130@gmail.com",
+    "network": "MTN",
+    "phone": "08131602092",
+    "amount": 100.0,
+    "wallet": "task",
+    "status": "Approved"
+  },
+  {
+    "id": "2",
+    "user_id": 1,
+    "name": "Vikool Makama",
+    "email": "vikoolmakama@gmail.com",
+    "network": "MTN",
+    "phone": "09034960760",
+    "amount": 100.0,
+    "wallet": "task",
+    "status": "Pending"
+  },
+  {
+    "id": "3",
+    "user_id": 1,
+    "name": "Vikool Makama",
+    "email": "vikoolmakama@gmail.com",
+    "network": "MTN",
+    "phone": "09034960760",
+    "amount": 1000.0,
+    "wallet": "task",
+    "status": "Pending"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "95de8280af3ec227",
+    "user_id": 1,
+    "user_name": "Vikool Makama",
+    "amount": 500.0,
+    "payment_method": "Opay",
+    "sender_name": "Elisha Makama Kamina.",
+    "screenshot": "/uploads/deposits/95de8280af3ec227.jpg",
+    "status": "Approved"
+  },
+  {
+    "id": "3410904f389797df",
+    "user_id": 2,
+    "user_name": "Jimmy Makama",
+    "amount": 350.0,
+    "payment_method": "Opay",
+    "sender_name": "Elisha Makama Kamina.",
+    "screenshot": "/uploads/deposits/3410904f389797df.jpg",
+    "status": "Approved"
+  },
+  {
+    "id": "9488d8e0aa8d1824",
+    "user_id": 1,
+    "user_name": "Vikool Makama",
+    "amount": 500.0,
+    "payment_method": "Opay",
+    "sender_name": "Elisha Makama Kamina.",
+    "screenshot": "/uploads/deposits/9488d8e0aa8d1824.jpg",
+    "status": "Pending"
+  },
+  {
+    "id": "1c3e32cc12595103",
+    "user_id": 1,
+    "user_name": "Vikool Makama",
+    "amount": 500.0,
+    "payment_method": "Opay",
+    "sender_name": "Elisha Makama Kamina.",
+    "screenshot": "/uploads/deposits/1c3e32cc12595103.jpg",
+    "status": "Approved"
+  },
+  {
+    "id": "d80ff1967cd55628",
+    "user_id": 1,
+    "user_name": "Vikool Makama",
+    "amount": 5000.0,
+    "payment_method": "Opay",
+    "sender_name": "Elisha Makama Kamina.",
+    "screenshot": "/uploads/deposits/d80ff1967cd55628.jpg",
+    "status": "Approved"
+  },
+  {
+    "id": "1b48caf01028c051",
+    "user_id": 2,
+    "user_name": "Jimmy Makama",
+    "amount": 500.0,
+    "payment_method": "Opay",
+    "sender_name": "Elisha Makama Kamina.",
+    "screenshot": "/uploads/deposits/1b48caf01028c051.jpg",
+    "status": "Pending"
+  }
+]

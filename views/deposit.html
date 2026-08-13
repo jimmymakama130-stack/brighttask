@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deposit — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+
+
+
+<style>
+.deposit-payment-card .payment-method,
+.deposit-payment-card .payment-method strong {
+    color: #5b4ff7;
+}
+.deposit-payment-card .account-name,
+.deposit-payment-card .account-number {
+    color: #111827;
+}
+.deposit-payment-card hr {
+    display: none;
+    border: 0;
+}
+</style>
+
+
+
+
+
+
+
+
+<style>
+.payment-method-card {
+  background: #ffffff !important;
+  border: 2px solid #b7dfc1 !important;
+  border-radius: 26px !important;
+  box-shadow: 0 12px 30px rgba(22, 101, 52, 0.12) !important;
+}
+
+.payment-method-card .payment-top,
+.payment-method-card .payment-detail {
+  border-top: none !important;
+  border-bottom: 1px solid #d7eadb !important;
+}
+
+.payment-method-card .payment-top span,
+.payment-method-card .payment-detail small {
+  font-family: "Brush Script MT", "Segoe Print", cursive !important;
+  color: #087f3f !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+}
+
+.payment-method-card .payment-top h2 {
+  font-family: "Brush Script MT", "Segoe Print", cursive !important;
+  color: #006b35 !important;
+  font-weight: 900 !important;
+  font-size: 2rem !important;
+}
+
+.payment-method-card .payment-detail strong {
+  font-family: "Brush Script MT", "Segoe Print", cursive !important;
+  color: #075c2d !important;
+  font-weight: 800 !important;
+  font-size: 1.25rem !important;
+}
+
+.payment-method-card .account-number {
+  font-family: "Brush Script MT", "Segoe Print", cursive !important;
+  color: #004d26 !important;
+  font-weight: 900 !important;
+  font-size: 1.5rem !important;
+  letter-spacing: 3px !important;
+}
+
+.payment-method-card .payment-copy-note {
+  color: #176b3a !important;
+  font-family: "Segoe Print", cursive !important;
+}
+
+.payment-method-card .payment-top::before,
+.payment-method-card .payment-top::after {
+  display: none !important;
+}
+</style>
+
+
+<style>
+.payment-method-card,
+.payment-method-card * {
+  color: #075e2b !important;
+}
+
+.payment-method-card {
+  border: 2px solid #198754 !important;
+  background: #f6fff9 !important;
+  box-shadow: 0 10px 28px rgba(0,90,40,.15) !important;
+}
+
+.payment-method-card .payment-top span,
+.payment-method-card .payment-detail small {
+  font-family: Georgia, serif !important;
+  color: #087f3f !important;
+  font-weight: 800 !important;
+}
+
+.payment-method-card .payment-top h2 {
+  font-family: Georgia, serif !important;
+  color: #005c2b !important;
+  font-weight: 900 !important;
+}
+
+.payment-method-card .payment-detail strong,
+.payment-method-card .account-number {
+  color: #004d26 !important;
+  font-weight: 900 !important;
+}
+
+.payment-method-card .payment-top,
+.payment-method-card .payment-detail {
+  border-color: #b8dfc5 !important;
+}
+</style>
+
+</head>
+
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/dashboard.html" class="logo">
+    Task<span>bright</span>
+  </a>
+</header>
+
+<main class="dashboard">
+
+  <a href="/dashboard.html" class="back-link">← Dashboard</a>
+
+  <section class="form-card deposit-page">
+
+    <div class="form-header">
+      <span class="form-eyebrow">WALLET FUNDING</span>
+      <h1>Deposit Funds</h1>
+      <p>
+        Add money to your Taskbright Deposit Balance to create tasks.
+      </p>
+    </div>
+
+    <div class="payment-method-card">
+
+      <div class="payment-top" style="border-top:0 !important;">
+        <div>
+          <span>PAYMENT INFORMATION</span>
+          <h2>PALMPAY TRANSFER</h2>
+        </div>
+
+        
+      </div>
+
+      <div class="payment-detail">
+        <small>RECIPIENT NAME</small>
+        <strong>Laraba Elisha Makama</strong>
+      </div>
+
+      <div class="payment-detail">
+        <small>DESTINATION NUMBER</small>
+        <strong class="account-number">9034960760</strong>
+      </div>
+
+      <div class="payment-copy-note">
+        Make your payment to this account, then submit the details below.
+      </div>
+
+    </div>
+
+    <div class="deposit-notice">
+      
+      <div>
+        <strong>Minimum deposit: 200</strong>
+        <p>
+          Your Deposit Balance will increase only after Admin approval.
+        </p>
+      </div>
+    </div>
+
+    <form method="POST" action="/deposit" enctype="multipart/form-data">
+
+      <div class="form-section-title">
+        <span>01</span>
+        <div>
+          <strong>Payment Details</strong>
+          <small>Tell us about the payment you made.</small>
+        </div>
+      </div>
+
+      <label for="amount">Amount Deposited</label>
+      <div class="input-wrap">
+        <input
+          id="amount" name="amount"
+          type="number"
+          min="200"
+          placeholder="Enter amount"
+          required
+        >
+      </div>
+
+      <label for="payment-method">Bank / Payment Method Used</label>
+      <input
+        id="payment-method"
+        type="text"
+        name="payment_method"
+        placeholder="Example: PalmPay"
+        required
+      >
+
+      <label for="sender-name">Sender Account Name</label>
+      <input
+        id="sender-name"
+        type="text"
+        name="sender_name"
+        placeholder="Name used to make payment"
+        required
+      >
+
+      <div class="form-section-title proof-title">
+        <span>02</span>
+        <div>
+          <strong>Payment Proof</strong>
+          <small>Upload your transaction screenshot.</small>
+        </div>
+      </div>
+
+      <label for="proof">Transaction Screenshot</label>
+
+      <label class="upload-box" for="proof">
+        <span class="upload-icon">↑</span>
+        <strong>Upload transaction screenshot</strong>
+        <small>JPG, PNG or WEBP</small>
+      </label>
+
+      <input
+        id="proof"
+        class="hidden-file-input"
+        type="file"
+        name="screenshot"
+        accept="image/jpeg,image/png,image/webp"
+        required
+      >
+
+      <div class="file-help">
+        Make sure the screenshot clearly shows the transaction amount,
+        sender details and transaction reference.
+      </div>
+
+      <button type="submit" class="primary-btn full-btn deposit-submit">
+        Submit Deposit
+        <span>→</span>
+      </button>
+
+      <p class="secure-note">
+        🔒 Your deposit will remain pending until verified by Admin.
+      </p>
+
+    </form>
+    
+
+
+    
+    <div class="deposit-history-inline">
+      <div class="section-title-row">
+        <h2>Deposit History</h2>
+      </div>
+
+      <div id="depositHistory">
+        <p class="history-loading">Loading deposit history...</p>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+
+<script>
+fetch("/deposit-history")
+  .then(response => response.json())
+  .then(deposits => {
+    const box = document.getElementById("depositHistory");
+
+    if (!box) return;
+
+    if (!Array.isArray(deposits) || deposits.length === 0) {
+      box.innerHTML = `
+        <div class="empty-tasks">
+          
+          <h2>No deposits yet</h2>
+          <p>Your deposit requests will appear here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    box.innerHTML = deposits.map(d => `
+      <article class="admin-request-card">
+        <div class="request-header">
+          <div>
+            <span class="pending-status">${d.status}</span>
+            <h2>₦${Number(d.amount).toLocaleString()} Deposit</h2>
+          </div>
+        </div>
+
+        <div class="request-details">
+          <div>
+            <span>Payment Method</span>
+            <strong>${d.payment_method}</strong>
+          </div>
+
+          <div>
+            <span>Sender Name</span>
+            <strong>${d.sender_name}</strong>
+          </div>
+        </div>
+      </article>
+    `).join("");
+  })
+  .catch(() => {
+    const box = document.getElementById("depositHistory");
+
+    if (box) {
+      box.innerHTML = `
+        <div class="empty-tasks">
+          <h2>Unable to load deposit history</h2>
+        </div>
+      `;
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Withdrawal History — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/dashboard.html" class="logo">
+    Task<span>bright</span>
+  </a>
+</header>
+
+<main class="dashboard">
+
+  <a href="/withdraw.html" class="back-link">
+    ← Make a Withdrawal
+  </a>
+
+  <section class="welcome">
+    <div>
+      <p>Your payment records</p>
+      <h1>Withdrawal History</h1>
+    </div>
+
+    <a href="/withdraw.html" class="primary-btn">
+      Withdraw
+    </a>
+  </section>
+
+  <section class="history-list">
+
+    <article class="history-card">
+
+      <div class="history-main">
+        <div>
+          <strong>₦1,000</strong>
+          <small>Task Wallet • Today</small>
+        </div>
+
+        <span class="pending-status">
+          Pending
+        </span>
+      </div>
+
+      <p class="history-message">
+        Your withdrawal is waiting for Admin approval.
+      </p>
+
+    </article>
+
+    <article class="history-card">
+
+      <div class="history-main">
+        <div>
+          <strong>₦500</strong>
+          <small>Referral Wallet • Yesterday</small>
+        </div>
+
+        <span class="approved-status">
+          Approved
+        </span>
+      </div>
+
+      <p class="history-message success">
+        Withdrawal approved and processed.
+      </p>
+
+    </article>
+
+    <article class="history-card rejected">
+
+      <div class="history-main">
+        <div>
+          <strong>₦700</strong>
+          <small>Task Wallet • 3 days ago</small>
+        </div>
+
+        <span class="rejected-status">
+          Rejected
+        </span>
+      </div>
+
+      <div class="rejection-reason">
+        <strong>Reason</strong>
+
+        <p>
+          Bank account details could not be verified. Please check your
+          account information and submit a new withdrawal request.
+        </p>
+      </div>
+
+    </article>
+
+  </section>
+
+</main>
+
+</body>
+</html>

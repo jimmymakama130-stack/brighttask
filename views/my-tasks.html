@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Created Tasks — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/dashboard.html" class="logo">
+    Task<span>bright</span>
+  </a>
+</header>
+
+<main class="dashboard">
+
+  <a href="/dashboard.html" class="back-link">
+    ← Dashboard
+  </a>
+
+  <section class="welcome">
+    <div>
+      <p>Task management</p>
+      <h1>My Created Tasks</h1>
+    </div>
+  </section>
+
+  <div class="task-notice">
+    👤 You are the task creator.
+    Worker submissions for your tasks come directly to you for review.
+  </div>
+
+  <section class="admin-request-list">
+    {{TASK_CARDS}}
+  </section>
+
+</main>
+
+</body>
+</html>

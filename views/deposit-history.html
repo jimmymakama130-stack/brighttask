@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deposit History — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar dashboard-nav">
+
+  <a href="/dashboard.html" class="logo">
+    Task<span>bright</span>
+  </a>
+
+</header>
+
+<main class="dashboard">
+
+  <a href="/deposit.html" class="back-link">
+    ← Make a Deposit
+  </a>
+
+  <section class="welcome">
+
+    <div>
+      <p>Your payment records</p>
+      <h1>Deposit History</h1>
+    </div>
+
+    <a href="/deposit.html" class="primary-btn">
+      + Deposit
+    </a>
+
+  </section>
+
+  <section class="history-list">
+
+    <article class="history-card">
+
+      <div class="history-main">
+
+        <div>
+          <strong>₦1,000</strong>
+          <small>PalmPay • Today</small>
+        </div>
+
+        <span class="approved-status">
+          Approved
+        </span>
+
+      </div>
+
+      <p class="history-message success">
+        Deposit approved. ₦1,000 has been added to your Deposit Balance.
+      </p>
+
+    </article>
+
+
+    <article class="history-card">
+
+      <div class="history-main">
+
+        <div>
+          <strong>₦500</strong>
+          <small>PalmPay • Yesterday</small>
+        </div>
+
+        <span class="pending-status">
+          Pending
+        </span>
+
+      </div>
+
+      <p class="history-message">
+        Waiting for Admin verification.
+      </p>
+
+    </article>
+
+
+    <article class="history-card rejected">
+
+      <div class="history-main">
+
+        <div>
+          <strong>₦300</strong>
+          <small>PalmPay • 2 days ago</small>
+        </div>
+
+        <span class="rejected-status">
+          Rejected
+        </span>
+
+      </div>
+
+      <div class="rejection-reason">
+
+        <strong>Reason</strong>
+
+        <p>
+          Transaction screenshot could not be verified.
+          Please submit a clearer transaction proof.
+        </p>
+
+      </div>
+
+    </article>
+
+  </section>
+
+</main>
+
+</body>
+</html>

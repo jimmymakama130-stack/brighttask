@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    :root {
+      --d-bg: #f7f8fc;
+      --d-card: #fff;
+      --d-text: #111827;
+      --d-muted: #667085;
+      --d-primary: #635bff;
+      --d-border: #e7e9f0;
+      --d-dark: #16152b;
+      --d-green: #17803d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--d-bg);
+      color: var(--d-text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    .dash-shell {
+      min-height: 100vh;
+      padding-bottom: 92px;
+    }
+
+    .dash-top {
+      width: min(1180px, calc(100% - 30px));
+      height: 78px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dash-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+
+    .dash-logo {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--d-primary);
+      color: white;
+      box-shadow: 0 8px 20px rgba(99,91,255,.22);
+    }
+
+    .dash-brand em {
+      color: var(--d-primary);
+      font-style: normal;
+    }
+
+    .dash-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dash-icon-btn {
+      width: 39px;
+      height: 39px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--d-border);
+      border-radius: 11px;
+      background: white;
+      color: #475467;
+      font-size: 15px;
+    }
+
+    .dash-avatar {
+      width: 39px;
+      height: 39px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: #eeedff;
+      color: var(--d-primary);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .dash-main {
+      width: min(1180px, calc(100% - 30px));
+      margin: auto;
+    }
+
+    .welcome-row {
+      margin: 17px 0 21px;
+    }
+
+    .welcome-row small {
+      color: var(--d-muted);
+      font-size: 11px;
+    }
+
+    .welcome-row h1 {
+      margin: 5px 0 0;
+      font-size: 28px;
+      letter-spacing: -1.3px;
+    }
+
+    .welcome-row h1 span {
+      color: var(--d-primary);
+    }
+
+    .wallet-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 13px;
+    }
+
+    .wallet-card {
+      min-height: 175px;
+      padding: 21px;
+      border-radius: 19px;
+      border: 1px solid var(--d-border);
+      background: white;
+    }
+
+    .wallet-card.main-wallet {
+      background: var(--d-dark);
+      color: white;
+      border-color: var(--d-dark);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .main-wallet::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      right: -70px;
+      bottom: -90px;
+      border-radius: 50%;
+      background: rgba(99,91,255,.35);
+    }
+
+    .wallet-label {
+      color: var(--d-muted);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .main-wallet .wallet-label {
+      color: #aaa8b8;
+    }
+
+    .wallet-balance {
+      margin-top: 10px;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+    }
+
+    .wallet-balance span {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .wallet-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 25px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .wallet-footer small {
+      color: #aaa8b8;
+      font-size: 9px;
+    }
+
+    .wallet-action {
+      padding: 9px 13px;
+      border-radius: 9px;
+      background: var(--d-primary);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .small-wallet-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wallet-symbol {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: #f1f0ff;
+      color: var(--d-primary);
+      font-weight: 900;
+    }
+
+    .small-wallet-balance {
+      margin-top: 26px;
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -.8px;
+    }
+
+    .small-wallet-note {
+      display: block;
+      margin-top: 5px;
+      color: var(--d-muted);
+      font-size: 9px;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 11px;
+      margin: 15px 0 28px;
+    }
+
+    .quick-action {
+      padding: 15px;
+      background: white;
+      border: 1px solid var(--d-border);
+      border-radius: 14px;
+      transition: .2s;
+    }
+
+    .quick-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(30,36,60,.06);
+    }
+
+    .quick-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: #f1f0ff;
+      color: var(--d-primary);
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .quick-action strong {
+      display: block;
+      font-size: 11px;
+    }
+
+    .quick-action small {
+      display: block;
+      color: var(--d-muted);
+      margin-top: 3px;
+      font-size: 9px;
+    }
+
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .section-title-row h2 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -.5px;
+    }
+
+    .section-title-row a {
+      color: var(--d-primary);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .task-card {
+      padding: 17px;
+      background: white;
+      border: 1px solid var(--d-border);
+      border-radius: 16px;
+    }
+
+    .task-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .task-type {
+      display: inline-flex;
+      padding: 6px 8px;
+      border-radius: 7px;
+      background: #eeedff;
+      color: var(--d-primary);
+      font-size: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .task-reward {
+      color: var(--d-green);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .task-card h3 {
+      margin: 13px 0 6px;
+      font-size: 14px;
+      letter-spacing: -.2px;
+    }
+
+    .task-card p {
+      margin: 0;
+      color: var(--d-muted);
+      font-size: 10px;
+      line-height: 1.6;
+    }
+
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 15px;
+      padding-top: 12px;
+      border-top: 1px solid var(--d-border);
+      color: var(--d-muted);
+      font-size: 9px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 50;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(620px, calc(100% - 24px));
+      height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 6px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid var(--d-border);
+      border-radius: 18px;
+      box-shadow: 0 15px 45px rgba(30,36,60,.13);
+      backdrop-filter: blur(15px);
+    }
+
+    .bottom-nav a {
+      width: 70px;
+      height: 54px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 12px;
+      color: #98a2b3;
+      font-size: 8px;
+      font-weight: 700;
+    }
+
+    .bottom-nav a span {
+      font-size: 16px;
+    }
+
+    .bottom-nav a.active {
+      color: var(--d-primary);
+      background: #eeedff;
+    }
+
+    @media (max-width: 900px) {
+      .wallet-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .main-wallet {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .dash-top {
+        height: 70px;
+      }
+
+      .dash-main {
+        width: calc(100% - 26px);
+      }
+
+      .wallet-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .main-wallet {
+        grid-column: auto;
+      }
+
+      .quick-actions {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .task-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wallet-balance {
+        font-size: 29px;
+      }
+
+      .welcome-row h1 {
+        font-size: 24px;
+      }
+
+      .bottom-nav {
+        width: calc(100% - 18px);
+      }
+
+      .bottom-nav a {
+        width: 60px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="dash-shell">
+
+  <header class="dash-top">
+
+    <a href="/dashboard.html" class="dash-brand">
+      <span class="dash-logo">T</span>
+      <span>Task<em>bright</em></span>
+    </a>
+
+    <div class="dash-top-actions">
+
+      <a href="/notifications.html" class="dash-icon-btn">
+        ♧
+      </a>
+
+      <a href="/profile.html" class="dash-avatar">
+        U
+      </a>
+
+    </div>
+
+  </header>
+
+
+  <main class="dash-main">
+
+    <section class="welcome-row">
+      <small>Good morning 👋</small>
+      <h1>Welcome back, <span>User</span></h1>
+    </section>
+
+
+    <section class="wallet-grid">
+
+      <div class="wallet-card main-wallet">
+
+        <span class="wallet-label">Deposit Balance</span>
+
+        <div class="wallet-balance">
+          <span>₦</span> 0.00
+        </div>
+
+        <div class="wallet-footer">
+          <small>Available for task creation</small>
+
+          <a href="/deposit.html" class="wallet-action">
+            Deposit
+          </a>
+        </div>
+
+      </div>
+
+
+      <div class="wallet-card">
+
+        <div class="small-wallet-title">
+
+          <span class="wallet-label">Task Wallet</span>
+
+          <span class="wallet-symbol">₦</span>
+
+        </div>
+
+        <div class="small-wallet-balance">
+          ₦0.00
+        </div>
+
+        <small class="small-wallet-note">
+          Available earnings
+        </small>
+
+      </div>
+
+
+      <div class="wallet-card">
+
+        <div class="small-wallet-title">
+
+          <span class="wallet-label">Referral Wallet</span>
+
+          <span class="wallet-symbol">↗</span>
+
+        </div>
+
+        <div class="small-wallet-balance">
+          ₦0.00
+        </div>
+
+        <small class="small-wallet-note">
+          Referral earnings
+        </small>
+
+      </div>
+
+    </section>
+
+
+    <section class="quick-actions">
+
+      <a href="/tasks.html" class="quick-action">
+        <span class="quick-icon">✓</span>
+        <strong>Find Tasks</strong>
+        <small>Earn rewards</small>
+      </a>
+
+      <a href="/create-task.html" class="quick-action">
+        <span class="quick-icon">＋</span>
+        <strong>Create Task</strong>
+        <small>Hire workers</small>
+      </a>
+
+      <a href="/withdraw.html" class="quick-action">
+        <span class="quick-icon">↗</span>
+        <strong>Withdraw</strong>
+        <small>Request payout</small>
+      </a>
+
+      <a href="/referrals.html" class="quick-action">
+        <span class="quick-icon">♧</span>
+        <strong>Refer & Earn</strong>
+        <small>Invite friends</small>
+      </a>
+
+      <a href="/airtime.html" class="quick-action">
+        <span class="quick-icon">▣</span>
+        <strong>Buy Airtime</strong>
+        <small>Use your balance</small>
+      </a>
+
+      <a href="/my-tasks.html" class="quick-action">
+        <span class="quick-icon">☷</span>
+        <strong>My Tasks</strong>
+        <small>Created tasks & submissions</small>
+      </a>
+
+    </section>
+
+
+
+
+  </main>
+
+
+  <nav class="bottom-nav">
+
+    <a href="/dashboard.html" class="active">
+      <span>⌂</span>
+      Home
+    </a>
+
+    <a href="/tasks.html">
+      <span>✓</span>
+      Tasks
+    </a>
+
+    <a href="/create-task.html">
+      <span>＋</span>
+      Create
+    </a>
+
+    <a href="/notifications.html">
+      <span>♧</span>
+      Alerts
+    </a>
+
+    <a href="/profile.html">
+      <span>●</span>
+      Profile
+    </a>
+
+  </nav>
+
+</div>
+
+<script>
+fetch("/api/account-status")
+  .then(r => r.json())
+  .then(data => {
+    const tasks = document.getElementById("availableTasks");
+    if (tasks && data.activated) {
+      tasks.style.display = "";
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1",
+    "user_id": 2,
+    "name": "Jimmy Makama",
+    "email": "jimmymakama130@gmail.com",
+    "wallet": "task",
+    "amount": 500.0,
+    "bank_name": "Palmpay",
+    "account_number": "9034960760",
+    "account_name": "ELISHA KAMINA MAKAMA",
+    "status": "Pending"
+  }
+]

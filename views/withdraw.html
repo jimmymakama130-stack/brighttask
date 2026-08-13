@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Withdrawal — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/dashboard.html" class="logo">Task<span>bright</span></a>
+</header>
+
+<main class="dashboard">
+  <a href="/dashboard.html" class="back-link">← Dashboard</a>
+
+  <section class="form-card money-page">
+
+    <div class="form-header">
+      <h1>Withdraw Earnings</h1>
+      <p>Choose your wallet and send your earnings to your bank account.</p>
+    </div>
+
+    <div class="wallet-withdraw-info redesigned-wallets">
+
+      <div>
+        <span>Task Wallet</span>
+        <strong>₦0</strong>
+        <small>Minimum ₦350 • Maximum ₦5,000</small>
+      </div>
+
+      <div>
+        <span>Referral Wallet</span>
+        <strong>₦0</strong>
+        <small>Minimum ₦300 • Maximum ₦7,000</small>
+      </div>
+
+    </div>
+
+<div id="withdrawalError" class="withdrawal-error" style="display:none;">
+  ⚠️ <strong>Insufficient wallet balance</strong>
+  <p>You do not have enough money in the selected wallet.</p>
+</div>
+    <form method="POST" action="/withdraw" id="withdrawForm">
+
+      <div class="form-section-title">
+        <span>01</span>
+        <div>
+          <strong>Withdrawal Details</strong>
+          <small>Select the wallet and amount.</small>
+        </div>
+      </div>
+
+      <label for="wallet">Withdraw From</label>
+      <select id="wallet" name="wallet" required>
+        <option value="">Select wallet</option>
+        <option value="task">Task Wallet</option>
+        <option value="referral">Referral Wallet</option>
+      </select>
+
+      <label for="withdraw-amount">Amount</label>
+      <div class="input-wrap">
+        <input
+          id="withdraw-amount" name="amount"
+          type="number"
+          min="300"
+          placeholder="Enter amount"
+          required
+        >
+      </div>
+
+      <div class="form-section-title proof-title">
+        <span>02</span>
+        <div>
+          <strong>Bank Details</strong>
+          <small>Enter the account that should receive your payment.</small>
+        </div>
+      </div>
+
+      <label for="bank">Bank Name</label>
+      <input id="bank" name="bank_name" type="text" placeholder="Enter bank name" required>
+
+      <label for="account-number">Account Number</label>
+      <input
+        id="account-number"
+        type="text"
+        name="account_number"
+        inputmode="numeric"
+        maxlength="10"
+        placeholder="10-digit account number"
+        required
+      >
+
+      <label for="account-name">Account Name</label>
+      <input
+        id="account-name"
+        type="text"
+        name="account_name"
+        placeholder="Account holder name"
+        required
+      >
+
+      <div class="withdrawal-warning">
+        <strong>⚠️ Check your details</strong>
+        <p>Incorrect bank details may delay your withdrawal.</p>
+      </div>
+
+      <button type="submit" class="primary-btn full-btn deposit-submit">
+        Submit Withdrawal
+        <span>→</span>
+      </button>
+
+      <p class="secure-note">🔒 Your withdrawal will be reviewed by Admin.</p>
+
+    </form>
+
+  <div class="deposit-history-inline">
+    <div class="section-title-row">
+      <h2>Withdrawal History</h2>
+    </div>
+
+    <div id="withdrawalHistory">
+      <p class="history-loading">Loading withdrawal history...</p>
+    </div>
+  </div>
+
+
+  </section>
+</main>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+
+if (params.get("error") === "insufficient") {
+  const error = document.getElementById("withdrawalError");
+  if (error) error.style.display = "block";
+}
+</script>
+
+<script>
+fetch("/withdrawal-history")
+  .then(response => response.text())
+  .then(html => {
+    const box = document.getElementById("withdrawalHistory");
+    if (box) {
+      box.innerHTML = html.trim() || `
+        <div class="empty-tasks">
+          <div class="empty-icon"></div>
+          <h2>No withdrawals yet</h2>
+          <p>Your withdrawal requests will appear here.</p>
+        </div>
+      `;
+    }
+  })
+  .catch(() => {
+    const box = document.getElementById("withdrawalHistory");
+    if (box) {
+      box.innerHTML = "<p>Unable to load withdrawal history.</p>";
+    }
+  });
+</script>
+
+</body>
+</html>

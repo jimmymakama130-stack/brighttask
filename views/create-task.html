@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Task — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/dashboard.html" class="logo">Task<span>bright</span></a>
+</header>
+
+<main class="dashboard">
+
+  <a href="/my-tasks.html" class="back-link">← My Created Tasks</a>
+
+  <section class="form-card create-task-page">
+
+    <div class="form-header">
+      <span class="form-eyebrow">TASK CREATOR</span>
+      <h1>Create a Task</h1>
+      <p>Publish a task for other Taskbright members to complete.</p>
+    </div>
+
+    <div class="creator-warning">
+      <strong>⚠️ Before publishing</strong>
+      <p>
+        Your Deposit Balance will be used to pay workers.
+        Minimum number of workers is <strong>5</strong>.
+      </p>
+    </div>
+
+    <form method="POST" action="/create-task">
+
+      <div class="form-section-title">
+        <span>01</span>
+        <div>
+          <strong>Task Information</strong>
+          <small>Tell workers exactly what they need to do.</small>
+        </div>
+      </div>
+
+      <label for="taskType">Task Type</label>
+
+      <select id="taskType" name="task_type" required>
+        <option value="">Select task type</option>
+        <option value="telegram_bot" data-cost="60">Telegram Bot — ₦60</option>
+        <option value="whatsapp_telegram" data-cost="14">WhatsApp Group / Telegram — ₦14</option>
+        <option value="custom" data-cost="85">Custom Task — ₦85</option>
+        <option value="app_install" data-cost="100">App Install and Register — ₦100</option>
+        <option value="youtube_subscribers" data-cost="20">YouTube Subscribers — ₦20</option>
+        <option value="facebook_followers" data-cost="14">Facebook Followers — ₦14</option>
+        <option value="website_signups" data-cost="35">Website Signups — ₦35</option>
+        <option value="instagram_followers" data-cost="13">Instagram Followers — ₦13</option>
+        <option value="tiktok_followers" data-cost="13">TikTok Followers — ₦13</option>
+        <option value="social_likes" data-cost="10">Facebook, TikTok, Instagram and YouTube Likes — ₦10</option>
+        <option value="social_comments" data-cost="13">Facebook, TikTok, Instagram and YouTube Comments — ₦13</option>
+      </select>
+
+      <label for="taskTitle">Task Title</label>
+      <input
+        id="taskTitle"
+        type="text"
+        placeholder="Example: Follow our Instagram page"
+        required
+      >
+
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        name="description" rows="6"
+        placeholder="Clearly explain what workers must do..."
+        required
+      ></textarea>
+
+      <label for="taskLink">Task Link</label>
+      <input
+        id="taskLink"
+        name="link"
+        type="url"
+        placeholder="https://..."
+        required
+      >
+
+      <div class="form-section-title proof-title">
+        <span>02</span>
+        <div>
+          <strong>Workers & Cost</strong>
+          <small>Choose how many workers you need.</small>
+        </div>
+      </div>
+
+      <label for="workerCount">Number of Workers</label>
+      <input
+        id="workerCount" name="workers"
+        type="number"
+        min="5"
+        value="5"
+        required
+      >
+
+      <div class="cost-preview redesigned-cost">
+        <div>
+          <span>Total Cost</span>
+          <strong id="totalCost">₦0</strong>
+        </div>
+
+      </div>
+
+      <div class="insufficient-funds" id="insufficientFunds">
+        Insufficient funds. Please deposit first.
+      </div>
+
+      <button type="submit" class="primary-btn full-btn deposit-submit">
+        Publish Task
+        <span>→</span>
+      </button>
+
+    </form>
+
+  </section>
+
+</main>
+
+<script>
+const taskType = document.getElementById("taskType");
+const workerCount = document.getElementById("workerCount");
+const totalCost = document.getElementById("totalCost");
+const insufficientFunds = document.getElementById("insufficientFunds");
+
+function calculateCost() {
+  const selected = taskType.options[taskType.selectedIndex];
+  const cost = Number(selected.dataset.cost || 0);
+  const value = workerCount.value.trim();
+
+  if (value === "") {
+    totalCost.textContent = "₦0";
+    return;
+  }
+
+  const workers = Number(value);
+  totalCost.textContent = "₦" + (cost * workers).toLocaleString();
+}
+
+taskType.addEventListener("change", calculateCost);
+workerCount.addEventListener("input", calculateCost);
+
+document.querySelector("form").addEventListener("submit", function(e) {
+  const workers = Number(workerCount.value);
+
+  if (!Number.isInteger(workers) || workers < 5) {
+    e.preventDefault();
+    alert("You must choose at least 5 workers.");
+    workerCount.focus();
+    return;
+  }
+});
+
+insufficientFunds.style.display = "none";
+calculateCost();
+</script>
+
+</body>
+</html>

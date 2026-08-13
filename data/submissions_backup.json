@@ -1,0 +1,14 @@
+[
+  {
+    "id": "ceee022cd9ef13f6",
+    "task_id": "5da26de945b44101",
+    "task_title": "",
+    "creator_id": 1,
+    "worker_id": 2,
+    "worker_name": "Jimmy Makama",
+    "worker_email": "jimmymakama130@gmail.com",
+    "proof": "grep -n 'def load_submissions\\|def save_submissions\\|def submit_task\\|def review_submission' app.py\r\ncat data/submissions.json",
+    "screenshot": "/uploads/submissions/ceee022cd9ef13f6.jpg",
+    "status": "Pending"
+  }
+]

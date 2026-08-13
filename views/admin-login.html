@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <a href="/" class="logo">Task<span>bright</span></a>
+</header>
+
+<main class="auth-page">
+
+  <section class="auth-card">
+
+    <div class="auth-logo">Task<span>bright</span> Admin</div>
+
+    <h1>Admin Login</h1>
+
+    <p>
+      Sign in to manage deposits, withdrawals, airtime requests and
+      platform activity.
+    </p>
+
+    <div class="admin-warning">
+      🔐 This area is restricted to authorized administrators.
+    </div>
+
+    <form action="/admin-login" method="POST">
+
+      <label>Admin email</label>
+
+      <input
+        type="email"
+        name="email"
+        placeholder="admin@example.com"
+        required
+      >
+
+      <label>Password</label>
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Enter admin password"
+        required
+      >
+
+      <button type="submit" class="primary-btn full-btn">
+        Sign In
+      </button>
+
+    </form>
+
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perform Task — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/tasks.html" class="logo">
+    Task<span>bright</span>
+  </a>
+</header>
+
+<main class="dashboard">
+
+  <a href="/tasks.html" class="back-link">
+    ← Back to Available Tasks
+  </a>
+
+  <section class="form-card">
+
+    <div class="task-detail-top">
+      <div>
+        <span class="task-category">Social</span>
+        <h1>Social Media Engagement</h1>
+      </div>
+
+      <strong>₦250</strong>
+    </div>
+
+    <div class="task-creator">
+      <div class="worker-avatar">T</div>
+      <div>
+        <strong>Created by Task Creator</strong>
+        <small>Task creator</small>
+      </div>
+    </div>
+
+    <div class="task-action-link"
+         style="margin:20px 0;padding:18px;border-radius:12px;background:#f5f7fa;">
+
+      <strong>Task Link</strong>
+
+      <p>
+        Open the link below to perform the task:
+      </p>
+
+      <a href=""
+         target="_blank"
+         rel="noopener noreferrer"
+         class="primary-btn full-btn">
+        Open Task Link
+      </a>
+
+    </div>
+
+    <div class="task-instructions">
+
+      <h2>Task Instructions</h2>
+
+      <ol>
+        <li>Open the task link above.</li>
+        <li>Complete the action requested by the creator.</li>
+        <li>Make sure your work satisfies the requirements.</li>
+        <li>Take a clear screenshot showing your completed work.</li>
+        <li>Upload your proof below and submit it for review.</li>
+      </ol>
+
+    </div>
+
+    <div class="worker-warning">
+      ⚠️
+      <strong>Important:</strong>
+      Submit genuine proof. Your task will be reviewed by the person
+      who created this task.
+    </div>
+
+    <form method="POST"
+          action="/submit-task"
+          enctype="multipart/form-data">
+
+      <input type="hidden"
+             name="task_id"
+             value="{{TASK_ID}}">
+
+      <label for="proof">
+        Your explanation
+      </label>
+
+      <textarea
+        id="proof"
+        name="proof"
+        rows="5"
+        placeholder="Tell the task creator what you completed..."
+        required
+      ></textarea>
+
+      <label for="screenshot">
+        Screenshot proof
+      </label>
+
+      <input
+        id="screenshot"
+        type="file"
+        name="screenshot"
+        accept="image/jpeg,image/png,image/webp"
+        required
+      >
+
+      <small class="file-help">
+        Upload a clear screenshot showing your completed work.
+      </small>
+
+      <button type="submit"
+              class="primary-btn full-btn">
+        Submit Task for Review
+      </button>
+
+    </form>
+
+  </section>
+
+</main>
+
+</body>
+</html>

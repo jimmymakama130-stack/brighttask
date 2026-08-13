@@ -1,0 +1,75 @@
+[
+  {
+    "id": "d516ffd9f8e7271e",
+    "task_id": "5da26de945b44101",
+    "task_title": "",
+    "creator_id": 1,
+    "worker_id": 2,
+    "worker_name": "Jimmy Makama",
+    "worker_email": "jimmymakama130@gmail.com",
+    "proof": "Ttg",
+    "screenshot": "/uploads/submissions/d516ffd9f8e7271e.jpg",
+    "status": "Rejected"
+  },
+  {
+    "id": "9f548c73e2ec6528",
+    "task_id": "5da26de945b44101",
+    "task_title": "",
+    "creator_id": 1,
+    "worker_id": 2,
+    "worker_name": "Jimmy Makama",
+    "worker_email": "jimmymakama130@gmail.com",
+    "proof": "H",
+    "screenshot": "/uploads/submissions/9f548c73e2ec6528.jpg",
+    "status": "Approved",
+    "reward_paid": true
+  },
+  {
+    "id": "5e5a1571bbe22aa3",
+    "task_id": "5da26de945b44101",
+    "task_title": "",
+    "creator_id": 1,
+    "worker_id": 2,
+    "worker_name": "Jimmy Makama",
+    "worker_email": "jimmymakama130@gmail.com",
+    "proof": "cat > views/my-submissions.html <<'EOF'\r\n<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n  <meta charset=\"UTF-8\">\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n  <title>My Submissions \u2014 Taskbright</title>\r\n  <link rel=\"stylesheet\" href=\"/css/style.css\">\r\n</head>\r\n<body>\r\n\r\n<header class=\"navbar dashboard-nav\">\r\n  <a href=\"/dashboard.html\" class=\"logo\">Task<span>bright</span></a>\r\n</header>\r\n\r\n<main class=\"dashboard\">\r\n  <a href=\"/tasks.html\" class=\"back-link\">\u2190 Available Tasks</a>\r\n\r\n  <section class=\"welcome\">\r\n    <div>\r\n      <p>Your task activity</p>\r\n      <h1>My Submissions</h1>\r\n    </div>\r\n  </section>\r\n\r\n  <section class=\"submission-list\">\r\n    <div class=\"empty-tasks\">\r\n      No submissions yet.\r\n    </div>\r\n  </section>\r\n</main>\r\n\r\n</body>\r\n</html>\r\nEOF",
+    "screenshot": "/uploads/submissions/5e5a1571bbe22aa3.jpg",
+    "status": "Rejected"
+  },
+  {
+    "id": "2dc1f88d9b6753f7",
+    "task_id": "5da26de945b44101",
+    "task_title": "",
+    "creator_id": 1,
+    "worker_id": 2,
+    "worker_name": "Jimmy Makama",
+    "worker_email": "jimmymakama130@gmail.com",
+    "proof": "BB",
+    "screenshot": "/uploads/submissions/2dc1f88d9b6753f7.jpg",
+    "status": "Rejected"
+  },
+  {
+    "id": "d6704fa61216b905",
+    "task_id": "ff2ae6122717339a",
+    "task_title": "",
+    "creator_id": 1,
+    "worker_id": 2,
+    "worker_name": "Jimmy Makama",
+    "worker_email": "jimmymakama130@gmail.com",
+    "proof": "Hhh",
+    "screenshot": "/uploads/submissions/d6704fa61216b905.jpg",
+    "status": "Approved"
+  },
+  {
+    "id": "1b683c2ca56352eb",
+    "task_id": "933f1453a7b0de56",
+    "task_title": "",
+    "creator_id": 1,
+    "worker_id": 2,
+    "worker_name": "Jimmy Makama",
+    "worker_email": "jimmymakama130@gmail.com",
+    "proof": "Gg",
+    "screenshot": "/uploads/submissions/1b683c2ca56352eb.jpg",
+    "status": "Approved"
+  }
+]

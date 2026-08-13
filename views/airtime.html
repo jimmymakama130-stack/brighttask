@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airtime — Taskbright</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<header class="navbar dashboard-nav">
+  <a href="/dashboard.html" class="logo">
+    Task<span>bright</span>
+  </a>
+</header>
+
+<main class="dashboard">
+
+  <a href="/dashboard.html" class="back-link">← Dashboard</a>
+
+  <section class="form-card airtime-page">
+
+    <div class="form-header">
+      <span class="form-eyebrow">MOBILE SERVICES</span>
+      <h1>Buy Airtime</h1>
+      <p>
+        Purchase airtime using your available Task or Referral Wallet.
+      </p>
+    </div>
+
+    <div class="form-section-title">
+      <span>01</span>
+      <div>
+        <strong>Select Network</strong>
+        <small>Choose the network you want to recharge.</small>
+      </div>
+    </div>
+
+    <div class="airtime-networks redesigned-networks">
+
+      <button type="button" class="network-option active" data-network="MTN">
+        <strong>MTN</strong>
+      </button>
+
+      <button type="button" class="network-option" data-network="Airtel">
+        <strong>Airtel</strong>
+      </button>
+
+      <button type="button" class="network-option" data-network="GLO">
+        <strong>GLO</strong>
+      </button>
+
+      <button type="button" class="network-option" data-network="9mobile">
+        <strong>9mobile</strong>
+      </button>
+
+    </div>
+
+    <form method="POST" action="/airtime">
+
+      <input type="hidden" name="network" id="selectedNetwork" value="MTN">
+
+      <div class="form-section-title proof-title">
+        <span>02</span>
+        <div>
+          <strong>Recharge Details</strong>
+          <small>Enter the number and amount.</small>
+        </div>
+      </div>
+
+      <label for="phone">Phone Number</label>
+      <input
+        id="phone"
+        type="tel"
+        name="phone"
+        inputmode="numeric"
+        maxlength="11"
+        placeholder="08012345678"
+        required
+      >
+
+      <label for="airtime-amount">Amount</label>
+      <div class="input-wrap">
+        <span>₦</span>
+        <input
+          id="airtime-amount"
+          name="amount"
+          type="number"
+          min="100"
+          placeholder="Enter amount"
+          required
+        >
+      </div>
+
+      <label for="airtime-wallet">Pay From</label>
+      <select id="airtime-wallet" name="wallet" required>
+        <option value="">Select wallet</option>
+        <option value="task">Task Wallet</option>
+        <option value="referral">Referral Wallet</option>
+      </select>
+
+      <div class="airtime-warning">
+        <strong>📱 Minimum purchase: ₦100</strong>
+        <p>
+          Your airtime request will be processed after Admin approval.
+        </p>
+      </div>
+
+      <button type="submit" class="primary-btn full-btn deposit-submit">
+        Submit Airtime Request
+        <span>→</span>
+      </button>
+
+      <p class="secure-note">
+        🔒 Your wallet will only be charged after Admin approval.
+      </p>
+
+    </form>
+
+
+  </section>
+
+  <section class="form-card airtime-history-section">
+    <div class="form-header">
+      <p>Your recent requests</p>
+      <h2>Airtime History</h2>
+    </div>
+
+    <div id="airtimeHistory">
+      <p class="history-loading">Loading your airtime history...</p>
+    </div>
+  </section>
+
+</main>
+
+
+<script>
+const networkButtons = document.querySelectorAll(".network-option");
+const selectedNetwork = document.getElementById("selectedNetwork");
+
+networkButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    networkButtons.forEach(btn => {
+      btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+    selectedNetwork.value = button.dataset.network;
+  });
+});
+</script>
+
+<script>
+fetch("/airtime-history-data")
+  .then(response => response.json())
+  .then(data => {
+    const box = document.getElementById("airtimeHistory");
+
+    if (!data.length) {
+      box.innerHTML = `
+        <div class="empty-tasks">
+          <div class="empty-icon">📱</div>
+          <h3>No airtime requests yet</h3>
+          <p>Your airtime purchases will appear here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    box.innerHTML = data.map(item => `
+      <div class="airtime-history-card">
+        <div>
+          <strong>₦${Number(item.amount).toLocaleString()}</strong>
+          <span>${item.network} • ${item.phone}</span>
+        </div>
+
+        <div class="airtime-history-meta">
+          <span>${item.wallet} Wallet</span>
+          <strong class="status-${String(item.status).toLowerCase()}">
+            ${item.status}
+          </strong>
+        </div>
+      </div>
+    `).join("");
+  })
+  .catch(() => {
+    document.getElementById("airtimeHistory").innerHTML =
+      "<p>Unable to load airtime history.</p>";
+  });
+</script>
+
+</body>
+</html>
