@@ -1170,11 +1170,6 @@ def tasks():
 
     tasks = load_tasks()
     submissions = load_submissions()
-    submitted_task_ids = {
-        str(x.get("task_id"))
-        for x in submissions
-        if str(x.get("worker_id")) == str(user.get("id"))
-    }
 
     cards = ""
 
@@ -1182,9 +1177,50 @@ def tasks():
         if task.get("status") != "Active":
             continue
 
-        if task.get("creator_id") == user.get("id"):
+        # A task creator should manage their task from My Tasks,
+        # not perform their own task from the marketplace.
+        if str(task.get("creator_id")) == str(user.get("id")):
             continue
-        if str(task.get("id")) in submitted_task_ids:
+
+        task_id = str(task.get("id"))
+
+        # The task remains available until all worker slots have
+        # actually been approved.
+        try:
+            worker_limit = int(task.get("workers", 0) or 0)
+        except (TypeError, ValueError):
+            worker_limit = 0
+
+        try:
+            approved_count = int(task.get("approved", 0) or 0)
+        except (TypeError, ValueError):
+            approved_count = 0
+
+        if approved_count >= worker_limit:
+            continue
+
+        # A worker with a pending submission should not submit
+        # the same task again while it is being reviewed.
+        has_pending_submission = any(
+            str(x.get("task_id")) == task_id
+            and str(x.get("worker_id")) == str(user.get("id"))
+            and str(x.get("status", "Pending")).strip().lower() == "pending"
+            for x in submissions
+        )
+
+        if has_pending_submission:
+            continue
+
+        # An approved submission means this worker has already
+        # completed this task successfully.
+        has_approved_submission = any(
+            str(x.get("task_id")) == task_id
+            and str(x.get("worker_id")) == str(user.get("id"))
+            and str(x.get("status", "")).strip().lower() == "approved"
+            for x in submissions
+        )
+
+        if has_approved_submission:
             continue
 
         cards += f"""
@@ -1344,6 +1380,50 @@ def referrals_page():
     page = (VIEWS_DIR / "referrals.html").read_text()
     page = page.replace("{{REFERRAL_CODE}}", code)
     page = page.replace("{{REFERRAL_LINK}}", link)
+
+    return page
+
+
+@app.route("/admin-dashboard.html")
+def admin_dashboard():
+    if not session.get("admin"):
+        return redirect("/admin-login.html")
+
+    users = load_users()
+    deposits = load_deposits()
+    withdrawals = load_withdrawals()
+    airtime = load_airtime_requests()
+
+    pending_deposits = [
+        d for d in deposits
+        if str(d.get("status", "Pending")).strip().lower() == "pending"
+    ]
+
+    pending_withdrawals = [
+        w for w in withdrawals
+        if str(w.get("status", "Pending")).strip().lower() == "pending"
+    ]
+
+    pending_airtime = [
+        a for a in airtime
+        if str(a.get("status", "Pending")).strip().lower() == "pending"
+    ]
+
+    page = (VIEWS_DIR / "admin-dashboard.html").read_text()
+
+    stats = [
+        len(users),
+        len(pending_deposits),
+        len(pending_withdrawals),
+        len(pending_airtime),
+    ]
+
+    for value in stats:
+        page = page.replace(
+            "<strong>0</strong>",
+            f"<strong>{value}</strong>",
+            1
+        )
 
     return page
 
@@ -1514,7 +1594,7 @@ def task_submissions_page():
             <strong>Proof:</strong> {escape(str(proof))}
           </p>
 
-          {f'<img src="{escape(str(screenshot))}" style="max-width:100%;height:auto;border-radius:10px;margin-top:12px;">' if screenshot else ''}
+          {f'<details style="margin-top:12px;"><summary class="primary-btn" style="display:inline-block;cursor:pointer;">View Screenshot</summary><div style="margin-top:12px;"><img src="{escape(str(screenshot))}" loading="lazy" style="max-width:100%;height:auto;border-radius:10px;display:block;"></div></details>' if screenshot else ''}
 
           {buttons}
         </article>
